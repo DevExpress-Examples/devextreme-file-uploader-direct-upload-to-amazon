@@ -13,8 +13,8 @@ function uploadChunk(file, uploadInfo) {
   let promise = null;
 
   if (uploadInfo.chunkIndex === 0) {
-    promise = gateway.getUploadAccessUrl(file.name).then((accessUrls) => {
-      uploadInfo.customData.accessUrl = accessUrls.url1;
+    promise = gateway.getUploadAccessUrl(file.name).then((accessUrl) => {
+      uploadInfo.customData.accessUrl = accessUrl.url1;
     });
   } else {
     promise = Promise.resolve();

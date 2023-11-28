@@ -1,9 +1,11 @@
 #message-box {
     display: none;
 }
+
 .show-message #message-box {
     display: block;
 }
+
 #request-panel {
     min-width: 505px;
     height: 400px;
@@ -11,14 +13,17 @@
     overflow-y: auto;
     padding: 18px;
     margin-top: 40px;
-    background-color: rgba(191, 191, 191, 0.15);
+    background-color: rgba(191 191 191 / 15%);
 }
+
 #request-panel .parameter-info {
     display: flex;
 }
+
 .request-info .parameter-name {
     flex: 0 0 100px;
 }
+
 .request-info .parameter-name,
 .request-info .parameter-value {
     overflow: hidden;
