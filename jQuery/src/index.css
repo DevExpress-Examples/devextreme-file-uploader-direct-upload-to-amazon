@@ -1,11 +1,3 @@
-#message-box {
-    display: none;
-}
-
-.show-message #message-box {
-    display: block;
-}
-
 #request-panel {
     min-width: 505px;
     height: 400px;
