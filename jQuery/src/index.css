@@ -1,3 +1,23 @@
+#widget-area {
+    visibility: hidden;
+}
+
+#message-box {
+    display: none;
+}
+
+.show-widget #widget-area {
+    visibility: visible;
+}
+
+.show-message #widget-area {
+    display: none;
+}
+
+.show-message #message-box {
+    display: block;
+}
+
 #request-panel {
     min-width: 505px;
     height: 400px;

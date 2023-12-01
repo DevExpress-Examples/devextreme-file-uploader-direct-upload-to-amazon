@@ -1,4 +1,17 @@
 $(() => {
+  const loadPanel = $('#load-panel').dxLoadPanel({
+    position: { of: '#file-uploader' },
+  }).dxLoadPanel('instance');
+
+  $.ajax({
+    url: 'https://localhost:7021/api/file-azure-status?widgetType=fileUploader',
+    success(result) {
+      const className = result.active ? 'show-widget' : 'show-message';
+      $('#wrapper').addClass(className);
+      loadPanel.hide();
+    },
+  });
+
   const endpointUrl = 'https://localhost:7021/api/file-uploader-azure-access';
   gateway = new AzureGateway(endpointUrl, onRequestExecuted);
 
