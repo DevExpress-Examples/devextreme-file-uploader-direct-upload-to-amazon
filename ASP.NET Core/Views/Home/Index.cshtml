@@ -1,29 +1,76 @@
 @using ASP_NET_Core.Models
+<script src="~/services/azure.gateway.js"></script>
 
-<h2>Home</h2>
-
-@(Html.DevExtreme().DataGrid<SampleOrder>()
-    .ShowBorders(true)
-    .DataSource(d => d.Mvc().Controller("SampleData").LoadAction("Get").Key("OrderID"))
-    .Columns(columns => {
-        columns.AddFor(m => m.OrderID);
-        columns.AddFor(m => m.OrderDate);
-        columns.AddFor(m => m.CustomerName);
-        columns.AddFor(m => m.ShipCountry);
-        columns.AddFor(m => m.ShipCity);
-    })
-    .Paging(p => p.PageSize(10))
-    .FilterRow(f => f.Visible(true))
-    .HeaderFilter(f => f.Visible(true))
-    .GroupPanel(p => p.Visible(true))
-    .Grouping(g => g.AutoExpandAll(false))
-    .RemoteOperations(true)
-    .Summary(s => s
-        .TotalItems(totalItems => {
-            totalItems.AddFor(m => m.ShipCity).SummaryType(SummaryType.Count);
-        })
-        .GroupItems(groupItems => {
-            groupItems.Add().SummaryType(SummaryType.Count);
-        })
+<div id="wrapper">
+    <div id="widget-area">
+        @(Html.DevExtreme().FileUploader()
+            .ID("file-uploader")
+            .ChunkSize(200000)
+            .MaxFileSize(1048576)
+            .UploadChunk("uploadChunk")
+            )
+        <div id="request-panel"></div>
+    </div>
+    @(Html.DevExtreme().LoadPanel()
+        .ID("load-panel")
+        .Visible(true)
+        .Position(p => p.Of("#file-uploader"))
     )
-)
+    <div id="message-box">
+        To run the demo locally, specify your Azure storage account name, access key and container name in the appsettings.json file in your back-end app.
+    </div>
+</div>
+
+<script>
+    $.ajax({
+        url: 'https://localhost:7021/api/file-azure-status?widgetType=fileUploader',
+        success(result) {
+            const className = result.active ? 'show-widget' : 'show-message';
+            $('#wrapper').addClass(className);
+            $("#load-panel").dxLoadPanel("hide");
+        },
+        error() {
+            $("#load-panel").dxLoadPanel("hide");
+        }
+    });
+
+    function uploadChunk(file, uploadInfo) {
+        let promise = null;
+        if (uploadInfo.chunkIndex === 0) {
+            promise = gateway.getUploadAccessUrl(file.name).then(function (accessUrls) {
+                uploadInfo.customData.accessUrl = accessUrls.url1;
+            });
+        } else {
+            promise = Promise.resolve();
+        }
+        promise = promise.then(function () {
+            return gateway.putBlock(uploadInfo.customData.accessUrl, uploadInfo.chunkIndex, uploadInfo.chunkBlob);
+        });
+        if (uploadInfo.chunkIndex === uploadInfo.chunkCount - 1) {
+            promise = promise.then(function () {
+                return gateway.putBlockList(uploadInfo.customData.accessUrl, uploadInfo.chunkCount);
+            });
+        }
+        return promise;
+    }
+
+    function onRequestExecuted(e) {
+        $("<div>").addClass("request-info").append(
+            createParameterInfoDiv("Method:", e.method),
+            createParameterInfoDiv("Url path:", e.urlPath),
+            createParameterInfoDiv("Query string:", e.queryString),
+            $("<br>")
+        )
+        .prependTo("#request-panel");
+    }
+
+    function createParameterInfoDiv(name, value) {
+        return $("<div>").addClass("parameter-info").append(
+            $("<div>").addClass("parameter-name").text(name),
+            $("<div>").addClass("parameter-value dx-theme-accent-as-text-color").text(value).attr("title", value)
+        );
+    }
+
+    const endpointUrl = 'https://localhost:7021/api/file-uploader-azure-access';
+    const gateway = new AzureGateway(endpointUrl, onRequestExecuted);
+</script>
