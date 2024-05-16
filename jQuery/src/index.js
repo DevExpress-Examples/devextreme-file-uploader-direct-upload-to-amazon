@@ -14,7 +14,7 @@ $(() => {
     },
   });
 
-  baseUrl = `https://localhost:52366/api/AmazonS3`;
+  baseUrl = 'https://localhost:52366/api/AmazonS3';
   amazon = new AmazonFileSystem(baseUrl, onRequestExecuted);
 
   $('#file-uploader').dxFileUploader({
@@ -26,31 +26,34 @@ $(() => {
 });
 
 async function onUploaded(e) {
+  /* eslint-disable-next-line spellcheck/spell-checker */
   const url = await amazon.getPresignedDownloadUrl(e.file.name);
+  /* eslint-disable-next-line spellcheck/spell-checker */
   showPresignedUrl(url, e.file.name);
 }
 
 function onValueChanged(e) {
+  /* eslint-disable-next-line spellcheck/spell-checker */
   hidePresignedUrl();
 }
 
 async function uploadChunk(file, uploadInfo) {
-  return await amazon.uploadFileChunk(file, uploadInfo);    
-};
-
+  return amazon.uploadFileChunk(file, uploadInfo);
+}
+/* eslint-disable-next-line spellcheck/spell-checker */
 function showPresignedUrl(url, fileName) {
   $('<div>')
-      .attr('id', 'url-div')
-      .append(
-        $('<span>').text('Download uploaded file: '),
-        $('<a>')
-            .attr('href', url)
-            .attr('target', '_blank')
-            .text(fileName)
-      )
-      .appendTo('#download-panel');
+    .attr('id', 'url-div')
+    .append(
+      $('<span>').text('Download uploaded file: '),
+      $('<a>')
+        .attr('href', url)
+        .attr('target', '_blank')
+        .text(fileName),
+    )
+    .appendTo('#download-panel');
 }
-
+/* eslint-disable-next-line spellcheck/spell-checker */
 function hidePresignedUrl() {
   $('#url-div').remove();
 }
@@ -72,4 +75,4 @@ function createParameterInfoDiv(name, value) {
   );
 }
 
-let gateway = null;
+const gateway = null;

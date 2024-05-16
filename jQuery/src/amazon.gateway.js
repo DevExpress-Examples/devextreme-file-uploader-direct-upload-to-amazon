@@ -121,13 +121,14 @@ class AmazonGateway {
     this.initUploadData(params.key, uploadId);
   }
 
+  /* eslint-disable-next-line spellcheck/spell-checker */
   async getPresignedDownloadUrl(fileName) {
     const params = { key: fileName };
     const requestOptions = {
       method: 'POST',
       headers: this.defaultHeaders,
     };
-    return await this.makeRequestAsync('getPresignedDownloadUrl', params, requestOptions);
+    return this.makeRequestAsync('getPresignedDownloadUrl', params, requestOptions);
   }
 
   async makeRequestAsync(method, queryParams, requestParams) {

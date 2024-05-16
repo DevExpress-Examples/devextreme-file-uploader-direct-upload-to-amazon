@@ -69,8 +69,10 @@ class AmazonFileSystem {
     }
   }
 
+  /* eslint-disable-next-line spellcheck/spell-checker */
   async getPresignedDownloadUrl(fileName) {
-    return await this.gateway.getPresignedDownloadUrl(fileName);
+    /* eslint-disable-next-line spellcheck/spell-checker */
+    return this.gateway.getPresignedDownloadUrl(fileName);
   }
 
   getFileNameFromKey(key) {
