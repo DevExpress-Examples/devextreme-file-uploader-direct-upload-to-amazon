@@ -59,7 +59,7 @@ export class AmazonFileSystem {
     }
     return key.substring(index + 1);
   }
-
+  /* eslint-disable-next-line vue/max-len */
   async uploadFileChunk(fileData: File, uploadInfo: UploadInfo, destinationDirectory: FileSystemItem | undefined): Promise<any> {
     try {
       if (uploadInfo.chunkIndex === 0) {

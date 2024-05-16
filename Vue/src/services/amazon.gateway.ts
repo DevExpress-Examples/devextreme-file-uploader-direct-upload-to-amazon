@@ -85,7 +85,7 @@ export class AmazonGateway {
     const requestParams = { method: 'POST', body: JSON.stringify(keys), headers: this.defaultHeaders };
     return this.makeRequestAsync('downloadItems', params, requestParams);
   }
-
+  /* eslint-disable-next-line vue/max-len */
   async uploadPart(fileData: File, uploadInfo: UploadInfo, destinationDirectory: FileSystemItem | undefined): Promise<any> {
     const params = {};
     const key = `${destinationDirectory?.key ?? ''}${fileData.name}`;
@@ -106,7 +106,7 @@ export class AmazonGateway {
     // partNumber must be > 0
     this.addPartToUploadData(key, { PartNumber: uploadInfo.chunkIndex + 1, ETag: etag });
   }
-
+  /* eslint-disable-next-line vue/max-len */
   async completeUpload(fileData: File, uploadInfo: UploadInfo, destinationDirectory: FileSystemItem | undefined): Promise<any> {
     const key = `${destinationDirectory?.key ?? ''}${fileData.name}`;
     const params = {
@@ -142,7 +142,7 @@ export class AmazonGateway {
     };
     return this.makeRequestAsync('getPresignedDownloadUrl', params, requestOptions);
   }
-
+  /* eslint-disable-next-line vue/max-len */
   async makeRequestAsync(method: string, queryParams: any, requestParams: RequestInit): Promise<any> {
     const requestUrl = this.getRequestUrl(method);
     const url = new URL(requestUrl);
