@@ -1,52 +1,61 @@
 $(() => {
   const loadPanel = $('#load-panel').dxLoadPanel({
     position: { of: '#file-uploader' },
+    visible: true,
   }).dxLoadPanel('instance');
 
   $.ajax({
-    url: 'https://localhost:7021/api/file-azure-status?widgetType=fileUploader',
+    url: 'https://localhost:52366/api/AmazonS3/getItems',
     success(result) {
+      result.active = true;
       const className = result.active ? 'show-widget' : 'show-message';
       $('#wrapper').addClass(className);
       loadPanel.hide();
     },
   });
 
-  const endpointUrl = 'https://localhost:7021/api/file-uploader-azure-access';
-  gateway = new AzureGateway(endpointUrl, onRequestExecuted);
+  baseUrl = 'https://localhost:52366/api/AmazonS3';
+  amazon = new AmazonFileSystem(baseUrl, onRequestExecuted);
 
   $('#file-uploader').dxFileUploader({
-    chunkSize: 200000,
-    maxFileSize: 1048576,
+    chunkSize: 5242880,
     uploadChunk,
+    onValueChanged,
+    onUploaded,
   });
 });
 
-function uploadChunk(file, uploadInfo) {
-  let promise = null;
+async function onUploaded(e) {
+  /* eslint-disable-next-line spellcheck/spell-checker */
+  const url = await amazon.getPresignedDownloadUrl(e.file.name);
+  /* eslint-disable-next-line spellcheck/spell-checker */
+  showPresignedUrl(url, e.file.name);
+}
 
-  if (uploadInfo.chunkIndex === 0) {
-    promise = gateway.getUploadAccessUrl(file.name).then((accessUrl) => {
-      uploadInfo.customData.accessUrl = accessUrl.url1;
-    });
-  } else {
-    promise = Promise.resolve();
-  }
+function onValueChanged(e) {
+  /* eslint-disable-next-line spellcheck/spell-checker */
+  hidePresignedUrl();
+}
 
-  promise = promise.then(() => gateway.putBlock(
-    uploadInfo.customData.accessUrl,
-    uploadInfo.chunkIndex,
-    uploadInfo.chunkBlob,
-  ));
-
-  if (uploadInfo.chunkIndex === uploadInfo.chunkCount - 1) {
-    promise = promise.then(() => gateway.putBlockList(
-      uploadInfo.customData.accessUrl,
-      uploadInfo.chunkCount,
-    ));
-  }
-
-  return promise;
+async function uploadChunk(file, uploadInfo) {
+  return amazon.uploadFileChunk(file, uploadInfo);
+}
+/* eslint-disable-next-line spellcheck/spell-checker */
+function showPresignedUrl(url, fileName) {
+  $('<div>')
+    .attr('id', 'url-div')
+    .append(
+      $('<span>').text('Download uploaded file: '),
+      $('<a>')
+        .attr('href', url)
+        .attr('target', '_blank')
+        .text(fileName),
+    )
+    .appendTo('#download-panel');
+}
+/* eslint-disable-next-line spellcheck/spell-checker */
+function hidePresignedUrl() {
+  $('#url-div').remove();
 }
 
 function onRequestExecuted(e) {
@@ -66,4 +75,4 @@ function createParameterInfoDiv(name, value) {
   );
 }
 
-let gateway = null;
+const gateway = null;

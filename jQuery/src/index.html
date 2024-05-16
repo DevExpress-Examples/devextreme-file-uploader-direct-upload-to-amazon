@@ -8,8 +8,8 @@
     <link rel="icon" href="/favicon.ico" />
     <link rel="stylesheet" type="text/css" href="../node_modules/devextreme-dist/css/dx.material.blue.light.compact.css" />
     <link rel="stylesheet" type="text/css" href="index.css" />
-    <script src="azure.file.system.js"></script>
-    <script src="azure.gateway.js"></script>
+    <script type="text/javascript" src="./amazon.filesystem.js"></script>
+    <script type="text/javascript" src="./amazon.gateway.js"></script>
     <script type="text/javascript" src="../node_modules/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="../node_modules/devextreme-dist/js/dx.all.js"></script>
     <script type="text/javascript" src="index.js"></script>
@@ -20,10 +20,11 @@
       <div id="wrapper">
         <div id="widget-area">
           <div id="file-uploader"></div>
+          <div id="download-panel"></div>
           <div id="request-panel"></div>
         </div>
         <div id="load-panel"></div>
-        <div id="message-box"> To run the example locally, specify your Azure storage account name, access key, and container name in the <strong>appsettings.json</strong> file. </div>
+        <div id="message-box"> To run the example locally, specify your Amazon access key, secret key, bucket and region name in the <strong>appsettings.json</strong> file. </div>
       </div>
     </div>
   </body>

@@ -3,8 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 
 import UploadInfo from 'devextreme/file_management/upload_info';
-import { AzureGateway } from './services/azure.gateway';
-import { AzureResponse } from './services/app.service.types';
+import { ValueChangedEvent, UploadedEvent } from 'devextreme/ui/file_uploader';
+
+import { AmazonGateway } from './services/amazon.gateway';
+import { AmazonFileSystem } from './services/amazon.filesystem';
 
 @Component({
   selector: 'app-root',
@@ -18,34 +20,49 @@ export class AppComponent {
 
   loadPanelVisible: boolean;
 
-  gateway: AzureGateway;
+  downloadFileName: string;
+
+  downloadUrl: string;
+
+  gateway: AmazonGateway;
+
+  amazon: AmazonFileSystem;
+
+  downloadPanelVisible: boolean;
 
   constructor(http: HttpClient) {
-    const endpointUrl = 'https://localhost:7021/api/file-uploader-azure-access';
-    this.gateway = new AzureGateway(endpointUrl, this.onRequestExecuted.bind(this));
+    const endpointUrl = 'https://localhost:52366/api/AmazonS3';
+    this.gateway = new AmazonGateway(endpointUrl, this.onRequestExecuted.bind(this));
+    this.amazon = new AmazonFileSystem(this.gateway);
 
     this.requests = [];
     this.wrapperClassName = '';
     this.loadPanelVisible = true;
+    this.downloadFileName = '';
+    this.downloadUrl = '';
+    this.downloadPanelVisible = false;
 
-    this.checkAzureStatus(http);
+    this.checkAmazonStatus(http);
     this.uploadChunk = this.uploadChunk.bind(this);
+    this.onUploaded = this.onUploaded.bind(this);
+    this.onValueChanged = this.onValueChanged.bind(this);
   }
 
-  uploadChunk(file: File, uploadInfo: UploadInfo): Promise<AzureResponse> | null {
-    let promise = null;
-    if (uploadInfo.chunkIndex === 0) {
-      promise = this.gateway.getUploadAccessUrl(file.name).then((accessUrls) => {
-        uploadInfo.customData.accessUrl = accessUrls.url1;
-      });
-    } else {
-      promise = Promise.resolve();
-    }
-    promise = promise.then(() => this.gateway.putBlock(uploadInfo.customData.accessUrl, uploadInfo.chunkIndex, uploadInfo.chunkBlob));
-    if (uploadInfo.chunkIndex === uploadInfo.chunkCount - 1) {
-      promise = promise.then(() => this.gateway.putBlockList(uploadInfo.customData.accessUrl, uploadInfo.chunkCount));
-    }
-    return promise;
+  async uploadChunk(file: File, uploadInfo: UploadInfo): Promise<any> {
+    return this.amazon.uploadFileChunk(file, uploadInfo, undefined);
+  }
+
+  async onUploaded(e: UploadedEvent): Promise<any> {
+    const url = await this.amazon.getPresignedDownloadUrl(e.file.name);
+    this.downloadFileName = e.file.name;
+    this.downloadUrl = url;
+    this.downloadPanelVisible = true;
+  }
+
+  onValueChanged(e: ValueChangedEvent): void {
+    this.downloadPanelVisible = false;
+    this.downloadFileName = '';
+    this.downloadUrl = '';
   }
 
   onRequestExecuted({ method, urlPath, queryString }: { method: string; urlPath: string; queryString: string }): void {
@@ -53,9 +70,10 @@ export class AppComponent {
     this.requests.unshift(request);
   }
 
-  checkAzureStatus(http: HttpClient): void {
-    lastValueFrom(http.get<{ active: boolean }>('https://localhost:7021/api/file-azure-status?widgetType=fileUploader'))
+  checkAmazonStatus(http: HttpClient): void {
+    lastValueFrom(http.get<{ active: boolean }>('https://localhost:52366/api/AmazonS3/getItems'))
       .then((result) => {
+        result.active = true;
         this.wrapperClassName = result.active ? 'show-widget' : 'show-message';
         this.loadPanelVisible = false;
       })

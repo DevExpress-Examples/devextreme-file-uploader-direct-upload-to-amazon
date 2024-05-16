@@ -1,30 +1,34 @@
 @using ASP_NET_Core.Models
-<script src="~/services/azure.gateway.js"></script>
+<script type="text/javascript" src="~/services/amazon.filesystem.js"></script>
+<script type="text/javascript" src="~/services/amazon.gateway.js"></script>
 
 <div id="wrapper">
     <div id="widget-area">
         @(Html.DevExtreme().FileUploader()
             .ID("file-uploader")
-            .ChunkSize(200000)
-            .MaxFileSize(1048576)
+            .ChunkSize(5242880)
             .UploadChunk("uploadChunk")
+            .OnValueChanged("onValueChanged")
+            .OnUploaded("onUploaded")
             )
+        <div id="download-panel"></div>
         <div id="request-panel"></div>
     </div>
     @(Html.DevExtreme().LoadPanel()
         .ID("load-panel")
         .Visible(true)
-        .Position(p => p.Of("#file-uploader"))
+        .Position(p => p.Of("#widget-area"))
     )
     <div id="message-box">
-        To run the demo locally, specify your Azure storage account name, access key and container name in the appsettings.json file in your back-end app.
+        To run the demo locally, specify your Amazon access key, secret key, region and bucket name in the appsettings.json file in your back-end app.
     </div>
 </div>
 
 <script>
     $.ajax({
-        url: 'https://localhost:7021/api/file-azure-status?widgetType=fileUploader',
+        url: 'https://localhost:52366/api/AmazonS3/getItems',
         success(result) {
+            result.active = true;
             const className = result.active ? 'show-widget' : 'show-message';
             $('#wrapper').addClass(className);
             $("#load-panel").dxLoadPanel("hide");
@@ -34,24 +38,35 @@
         }
     });
 
-    function uploadChunk(file, uploadInfo) {
-        let promise = null;
-        if (uploadInfo.chunkIndex === 0) {
-            promise = gateway.getUploadAccessUrl(file.name).then(function (accessUrls) {
-                uploadInfo.customData.accessUrl = accessUrls.url1;
-            });
-        } else {
-            promise = Promise.resolve();
-        }
-        promise = promise.then(function () {
-            return gateway.putBlock(uploadInfo.customData.accessUrl, uploadInfo.chunkIndex, uploadInfo.chunkBlob);
-        });
-        if (uploadInfo.chunkIndex === uploadInfo.chunkCount - 1) {
-            promise = promise.then(function () {
-                return gateway.putBlockList(uploadInfo.customData.accessUrl, uploadInfo.chunkCount);
-            });
-        }
-        return promise;
+
+    const onUploaded = async function(e) {
+        const url = await amazon.getPresignedDownloadUrl(e.file.name);
+        showPresignedUrl(url, e.file.name);
+    }
+
+    function onValueChanged(e) {
+        hidePresignedUrl();
+    }
+
+    async function uploadChunk(file, uploadInfo) {
+        return await amazon.uploadFileChunk(file, uploadInfo);    
+    };
+
+    function showPresignedUrl(url, fileName) {
+    $('<div>')
+        .attr('id', 'url-div')
+        .append(
+            $('<span>').text('Download uploaded file: '),
+            $('<a>')
+                .attr('href', url)
+                .attr('target', '_blank')
+                .text(fileName)
+        )
+        .appendTo('#download-panel');
+    }
+
+    function hidePresignedUrl() {
+        $('#url-div').remove();
     }
 
     function onRequestExecuted(e) {
@@ -71,6 +86,6 @@
         );
     }
 
-    const endpointUrl = 'https://localhost:7021/api/file-uploader-azure-access';
-    const gateway = new AzureGateway(endpointUrl, onRequestExecuted);
+    const endpointUrl = 'https://localhost:52366/api/AmazonS3';
+    const amazon = new AmazonFileSystem(endpointUrl, onRequestExecuted);
 </script>
