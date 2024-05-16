@@ -1,52 +1,58 @@
 $(() => {
   const loadPanel = $('#load-panel').dxLoadPanel({
     position: { of: '#file-uploader' },
+    visible: true,
   }).dxLoadPanel('instance');
 
   $.ajax({
-    url: 'https://localhost:7021/api/file-azure-status?widgetType=fileUploader',
+    url: 'https://localhost:52366/api/AmazonS3/getItems',
     success(result) {
+      result.active = true;
       const className = result.active ? 'show-widget' : 'show-message';
       $('#wrapper').addClass(className);
       loadPanel.hide();
     },
   });
 
-  const endpointUrl = 'https://localhost:7021/api/file-uploader-azure-access';
-  gateway = new AzureGateway(endpointUrl, onRequestExecuted);
+  baseUrl = `https://localhost:52366/api/AmazonS3`;
+  amazon = new AmazonFileSystem(baseUrl, onRequestExecuted);
 
   $('#file-uploader').dxFileUploader({
-    chunkSize: 200000,
-    maxFileSize: 1048576,
+    chunkSize: 5242880,
     uploadChunk,
+    onValueChanged,
+    onUploaded,
   });
 });
 
-function uploadChunk(file, uploadInfo) {
-  let promise = null;
+async function onUploaded(e) {
+  const url = await amazon.getPresignedDownloadUrl(e.file.name);
+  showPresignedUrl(url, e.file.name);
+}
 
-  if (uploadInfo.chunkIndex === 0) {
-    promise = gateway.getUploadAccessUrl(file.name).then((accessUrl) => {
-      uploadInfo.customData.accessUrl = accessUrl.url1;
-    });
-  } else {
-    promise = Promise.resolve();
-  }
+function onValueChanged(e) {
+  hidePresignedUrl();
+}
 
-  promise = promise.then(() => gateway.putBlock(
-    uploadInfo.customData.accessUrl,
-    uploadInfo.chunkIndex,
-    uploadInfo.chunkBlob,
-  ));
+async function uploadChunk(file, uploadInfo) {
+  return await amazon.uploadFileChunk(file, uploadInfo);    
+};
 
-  if (uploadInfo.chunkIndex === uploadInfo.chunkCount - 1) {
-    promise = promise.then(() => gateway.putBlockList(
-      uploadInfo.customData.accessUrl,
-      uploadInfo.chunkCount,
-    ));
-  }
+function showPresignedUrl(url, fileName) {
+  $('<div>')
+      .attr('id', 'url-div')
+      .append(
+        $('<span>').text('Download uploaded file: '),
+        $('<a>')
+            .attr('href', url)
+            .attr('target', '_blank')
+            .text(fileName)
+      )
+      .appendTo('#presigned-url');
+}
 
-  return promise;
+function hidePresignedUrl() {
+  $('#url-div').remove();
 }
 
 function onRequestExecuted(e) {
