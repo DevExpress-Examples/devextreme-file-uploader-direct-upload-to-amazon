@@ -48,7 +48,7 @@ function showPresignedUrl(url, fileName) {
             .attr('target', '_blank')
             .text(fileName)
       )
-      .appendTo('#presigned-url');
+      .appendTo('#download-panel');
 }
 
 function hidePresignedUrl() {

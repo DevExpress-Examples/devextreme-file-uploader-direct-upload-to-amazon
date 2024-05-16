@@ -5,11 +5,12 @@ import type { Ref } from 'vue';
 import 'devextreme/dist/css/dx.material.blue.light.compact.css';
 import { DxFileUploader } from 'devextreme-vue/file-uploader';
 import { DxLoadPanel, DxPosition } from 'devextreme-vue/load-panel';
-import { AzureGateway } from '../services/azure.gateway';
+import { AmazonGateway } from '../services/amazon.gateway';
+import { AmazonFileSystem } from '@/services/amazon.filesystem';
+import type { UploadedEvent } from 'devextreme/ui/file_uploader';
 import type UploadInfo from 'devextreme/file_management/upload_info';
-import type { AzureResponse } from '../services/app.service.types';
 
-const endpointUrl = 'https://localhost:7021/api/file-uploader-azure-access';
+const endpointUrl = 'https://localhost:52366/api/AmazonS3';
 
 const onRequestExecuted = (
   { method, urlPath, queryString }: { method: string; urlPath: string; queryString: string }
@@ -18,37 +19,39 @@ const onRequestExecuted = (
   requests.value = [request, ...requests.value];
 };
 
-const gateway: AzureGateway = new AzureGateway(endpointUrl, onRequestExecuted);
+const gateway: AmazonGateway = new AmazonGateway(endpointUrl, onRequestExecuted);
+const amazon: AmazonFileSystem = new AmazonFileSystem(gateway);
 
-fetch('https://localhost:7021/api/file-azure-status?widgetType=fileUploader')
+fetch('https://localhost:52366/api/AmazonS3/getItems')
   .then((response) => response.json())
   .then((result) => {
+    result.active = true;
     wrapperClassName.value = result.active ? 'show-widget' : 'show-message';
     loadPanelVisible.value = false;
   });
 
-const uploadChunk = (file: File, uploadInfo: UploadInfo): Promise<AzureResponse> | null => {
-  let promise = null;
-  if (uploadInfo.chunkIndex === 0) {
-    promise = gateway.getUploadAccessUrl(file.name).then((accessUrls) => {
-      uploadInfo.customData.accessUrl = accessUrls.url1;
-    });
-  } else {
-    promise = Promise.resolve();
-  }
-  promise = promise.then(() =>
-    gateway.putBlock(uploadInfo.customData.accessUrl, uploadInfo.chunkIndex, uploadInfo.chunkBlob)
-  );
-  if (uploadInfo.chunkIndex === uploadInfo.chunkCount - 1) {
-    promise = promise.then(
-      () => gateway.putBlockList(uploadInfo.customData.accessUrl, uploadInfo.chunkCount)
-    );
-  }
-  return promise;
+const uploadChunk = async (file: File, uploadInfo: UploadInfo): Promise<any> => {
+  await amazon.uploadFileChunk(file, uploadInfo, undefined);
 };
+
+const onValueChangedEvent = (): void => {
+  downloadPanelVisible.value = false;
+  downloadFileName.value = '';
+  downloadUrl.value = '';
+};
+
+const onUploaded = async (e: UploadedEvent): Promise<any> => {
+  const url = await amazon.getPresignedDownloadUrl(e.file.name);
+  downloadFileName.value = e.file.name;
+  downloadUrl.value = url;
+  downloadPanelVisible.value = true;
+}
 
 const loadPanelVisible: Ref<boolean> = ref(true);
 const wrapperClassName: Ref<string> = ref('');
+const downloadPanelVisible: Ref<boolean> = ref(false);
+const downloadUrl: Ref<string> = ref('');
+const downloadFileName: Ref<string> = ref('');
 const requests: Ref<{ method: string; urlPath: string; queryString: string }[]> = ref([]);
 </script>
 <template>
@@ -59,15 +62,20 @@ const requests: Ref<{ method: string; urlPath: string; queryString: string }[]> 
     <DxLoadPanel
       v-model:visible="loadPanelVisible"
     >
-      <DxPosition of="#file-uploader"/>
+      <DxPosition of="#widget-area"/>
     </DxLoadPanel>
     <div id="widget-area">
       <DxFileUploader
         id="file-uploader"
-        :chunk-size="200000"
-        :max-file-size="1048576"
+        :chunk-size="5242880"
         :upload-chunk="uploadChunk"
+        @valueChanged="onValueChangedEvent"
+        @uploaded="onUploaded"
       />
+      <div v-if="downloadPanelVisible">
+        <span>Download uploaded file:</span>
+        <a :href="downloadUrl" target="_blank">{{ downloadFileName }}</a>
+      </div>
       <div id="request-panel">
         <div
           class="request-info"
@@ -97,8 +105,8 @@ const requests: Ref<{ method: string; urlPath: string; queryString: string }[]> 
       </div>
     </div>
     <div id="message-box">
-      To run the demo locally, specify your Azure storage account name, access
-      key and container name in the appsettings.json file in your back-end app.
+      To run the demo locally, specify your Amazon access key, secret
+      key, region and bucket name in the appsettings.json file in the back-end app.
     </div>
   </div>
 </template>

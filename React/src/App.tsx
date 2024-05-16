@@ -6,44 +6,43 @@ import 'devextreme/dist/css/dx.material.blue.light.compact.css';
 import FileUploader from 'devextreme-react/file-uploader';
 import LoadPanel from 'devextreme-react/load-panel';
 import UploadInfo from 'devextreme/file_management/upload_info';
-import { AzureGateway } from './services/azure.gateway';
-import { AzureResponse } from './services/app.service.types';
+import { UploadedEvent } from 'devextreme/ui/file_uploader';
+import { AmazonGateway } from './services/amazon.gateway';
+import { AmazonFileSystem } from './services/amazon.filesystem';
 
-const endpointUrl = 'https://localhost:7021/api/file-uploader-azure-access';
-const loadPanelPosition = { of: '#file-uploader' };
+const endpointUrl = 'https://localhost:52366/api/AmazonS3';
+const loadPanelPosition = { of: '#widget-area' };
 
 function App(): JSX.Element {
   const [requests, setRequests] = useState<{ method: string; urlPath: string; queryString: string }[]>([]);
   const [loadPanelVisible, setLoadPanelVisible] = useState<boolean>(true);
   const [wrapperClassName, setWrapperClassName] = useState<string>('');
+  const [downloadFileName, setDownloadFileName] = useState<string>('');
+  const [downloadUrl, setDownloadUrl] = useState<string>('');
+  const [downloadPanelVisible, setDownloadPanelVisible] = useState<boolean>(false);
 
-  const uploadChunk = useCallback((file: File, uploadInfo: UploadInfo): Promise<AzureResponse> | null => {
-    let promise = null;
-    if (uploadInfo.chunkIndex === 0) {
-      promise = gateway.getUploadAccessUrl(file.name).then((accessUrls) => {
-        uploadInfo.customData.accessUrl = accessUrls.url1;
-      });
-    } else {
-      promise = Promise.resolve();
-    }
-    promise = promise.then(() => gateway.putBlock(
-      uploadInfo.customData.accessUrl,
-      uploadInfo.chunkIndex,
-      uploadInfo.chunkBlob,
-    ));
-    if (uploadInfo.chunkIndex === uploadInfo.chunkCount - 1) {
-      promise = promise.then(() => gateway.putBlockList(
-        uploadInfo.customData.accessUrl,
-        uploadInfo.chunkCount,
-      ));
-    }
-    return promise;
+  const uploadChunk = useCallback((file: File, uploadInfo: UploadInfo): Promise<any> => amazon.uploadFileChunk(file, uploadInfo, undefined), []);
+  const onValueChanged = useCallback((): void => {
+    setDownloadPanelVisible(false);
+    setDownloadFileName('');
+    setDownloadUrl('');
+  }, []);
+
+  const onUploaded = useCallback((e: UploadedEvent): void => {
+    amazon.getPresignedDownloadUrl(e.file.name).then((url: string) => {
+      setDownloadFileName(e.file.name);
+      setDownloadUrl(url);
+      setDownloadPanelVisible(true);
+    }).catch((error: any) => {
+      throw error;
+    });
   }, []);
 
   useEffect(() => {
-    fetch('https://localhost:7021/api/file-azure-status?widgetType=fileUploader')
+    fetch('https://localhost:52366/api/AmazonS3/getItems')
       .then((response) => response.json())
       .then((result) => {
+        result.active = true;
         const className = result.active ? 'show-widget' : 'show-message';
         setWrapperClassName(className);
         setLoadPanelVisible(false);
@@ -55,13 +54,24 @@ function App(): JSX.Element {
     setRequests((requests) => [request, ...requests]);
   }, []);
 
-  const gateway = useMemo((): AzureGateway => new AzureGateway(endpointUrl, onRequestExecuted), []);
-
+  const gateway = useMemo((): AmazonGateway => new AmazonGateway(endpointUrl, onRequestExecuted), []);
+  const amazon = useMemo((): AmazonFileSystem => new AmazonFileSystem(gateway), []);
   return (
     <div id="wrapper" className={wrapperClassName}>
       <LoadPanel visible={loadPanelVisible} position={loadPanelPosition} />
       <div id="widget-area">
-        <FileUploader id="file-uploader" chunkSize={200000} maxFileSize={1048576} uploadChunk={uploadChunk} />
+        <FileUploader id="file-uploader"
+          chunkSize={5242880}
+          uploadChunk={uploadChunk}
+          onUploaded={onUploaded}
+          onValueChanged={onValueChanged}
+        />
+        {downloadPanelVisible && (
+          <div id="download-panel">
+            <span>Download uploaded file:</span>
+            <a href={downloadUrl} target="_blank">{downloadFileName}</a>
+          </div>
+        )}
         <div id="request-panel">
           {
             requests.map((r, i) => <div key={i} className="request-info">
@@ -83,8 +93,8 @@ function App(): JSX.Element {
         </div>
       </div>
       <div id="message-box">
-          To run the demo locally, specify your Azure storage account name,
-          access key and container name in the web.config file.
+          To run the demo locally, specify your Amazon access key, secret key,
+          region and bucket name in the web.config file.
       </div>
     </div>
   );

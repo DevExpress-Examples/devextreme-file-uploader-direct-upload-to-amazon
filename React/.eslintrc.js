@@ -4,19 +4,29 @@ module.exports = {
   overrides: [{
     files: ['*.ts', '*.tsx'],
     extends: ['devextreme/react'],
+    rules: {
+      "space-before-function-paren": [
+        "error",
+        {
+          "anonymous": "never",
+          "named": "never",
+          "asyncArrow": "always"
+        }
+      ],
+    },
     env: {
       browser: true,
-      es6: true
+      es2021: true
     },
     parserOptions: {
       project: './tsconfig.json',
       'createDefaultProgram': true,
-      'ecmaVersion': 6,
+      'ecmaVersion': 8,
     },
     globals: {
       System: false,
-      AzureGateway: false,
-      AzureFileSystem: false,
+      AmazonGateway: false,
+      AmazonFileSystem: false,
     },
     settings: {
       react: {
