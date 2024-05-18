@@ -34,6 +34,11 @@ const uploadChunk = async (file: File, uploadInfo: UploadInfo): Promise<any> => 
   await amazon.uploadFileChunk(file, uploadInfo, undefined);
 };
 
+const abortUpload = async (file: File, uploadInfo: UploadInfo): Promise<any> => {
+  console.log("abort");
+  await amazon.abortFileUpload(file, uploadInfo, undefined);
+}
+
 const onValueChangedEvent = (): void => {
   downloadPanelVisible.value = false;
   downloadFileName.value = '';
@@ -69,6 +74,7 @@ const requests: Ref<{ method: string; urlPath: string; queryString: string }[]> 
         id="file-uploader"
         :chunk-size="5242880"
         :upload-chunk="uploadChunk"
+        :abort-upload="abortUpload"
         @valueChanged="onValueChangedEvent"
         @uploaded="onUploaded"
       />

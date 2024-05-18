@@ -12,7 +12,7 @@ export class AmazonFileSystem {
   }
 
   async getItems(key: string): Promise<FileSystemItem[]> {
-    return await this.gateway.getItems(key) as Promise<FileSystemItem[]>;
+    return this.gateway.getItems(key) as Promise<FileSystemItem[]>;
   }
 
   async createDirectory(key: string, name: string): Promise<any> {
@@ -58,6 +58,10 @@ export class AmazonFileSystem {
       return key;
     }
     return key.substring(index + 1);
+  }
+  /* eslint-disable-next-line vue/max-len */
+  async abortFileUpload(fileData: File, uploadInfo: UploadInfo, destinationDirectory: FileSystemItem | undefined): Promise<any> {
+    await this.gateway.abortFileUpload(fileData, uploadInfo, destinationDirectory);
   }
   /* eslint-disable-next-line vue/max-len */
   async uploadFileChunk(fileData: File, uploadInfo: UploadInfo, destinationDirectory: FileSystemItem | undefined): Promise<any> {
