@@ -9,6 +9,7 @@
       id="file-uploader"
       [chunkSize]="5242880"
       [uploadChunk]="uploadChunk"
+      [abortUpload]="abortUpload"
       (onUploaded)="onUploaded($event)"
       (onValueChanged)="onValueChanged($event)"
     >

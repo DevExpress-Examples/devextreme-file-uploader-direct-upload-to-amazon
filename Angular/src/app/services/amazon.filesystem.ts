@@ -1,8 +1,8 @@
-import FileSystemItem from 'devextreme/file_management/file_system_item';
-import UploadInfo from 'devextreme/file_management/upload_info';
+import type FileSystemItem from 'devextreme/file_management/file_system_item';
+import type UploadInfo from 'devextreme/file_management/upload_info';
 import { saveAs } from 'file-saver';
 
-import { AmazonGateway } from './amazon.gateway';
+import type { AmazonGateway } from './amazon.gateway';
 
 export class AmazonFileSystem {
   gateway: AmazonGateway;
@@ -12,7 +12,7 @@ export class AmazonFileSystem {
   }
 
   async getItems(key: string): Promise<FileSystemItem[]> {
-    return await this.gateway.getItems(key) as Promise<FileSystemItem[]>;
+    return this.gateway.getItems(key) as Promise<FileSystemItem[]>;
   }
 
   async createDirectory(key: string, name: string): Promise<any> {
@@ -58,6 +58,10 @@ export class AmazonFileSystem {
       return key;
     }
     return key.substring(index + 1);
+  }
+
+  async abortFileUpload(fileData: File, uploadInfo: UploadInfo | undefined, destinationDirectory: FileSystemItem | undefined): Promise<any> {
+    await this.gateway.abortFileUpload(fileData, uploadInfo, destinationDirectory);
   }
 
   async uploadFileChunk(fileData: File, uploadInfo: UploadInfo, destinationDirectory: FileSystemItem | undefined): Promise<any> {

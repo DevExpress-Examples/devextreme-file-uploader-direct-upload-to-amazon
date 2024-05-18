@@ -19,6 +19,7 @@ $(() => {
 
   $('#file-uploader').dxFileUploader({
     chunkSize: 5242880,
+    abortUpload,
     uploadChunk,
     onValueChanged,
     onUploaded,
@@ -35,6 +36,10 @@ async function onUploaded(e) {
 function onValueChanged(e) {
   /* eslint-disable-next-line spellcheck/spell-checker */
   hidePresignedUrl();
+}
+
+async function abortUpload(file, uploadInfo) {
+  return amazon.abortUpload(file, uploadInfo);
 }
 
 async function uploadChunk(file, uploadInfo) {

@@ -36,10 +36,8 @@ namespace AmazonS3Backend {
             BucketName = builder.Configuration.GetValue<string>("AWS:Bucket")!;
 
             awsOptions.Credentials = new BasicAWSCredentials(accessKey, secretKey);
-            
             awsOptions.Region = RegionEndpoint.GetBySystemName(region);
             
-
             builder.Services.AddDefaultAWSOptions(awsOptions);
             
             builder.Services.AddAWSService<IAmazonS3>();

@@ -127,18 +127,21 @@ namespace AmazonS3Backend.Controllers {
         public async Task<IActionResult> CompleteUpload([FromBody] List<PartETag> parts, string key, string uploadId) {
             try {
                 var response = await provider.CompleteUploadAsync(key, uploadId, parts);
-                // use response if you need to pass ETag or something else when upload is finished
+                // use `response` if you need to pass ETag or something else when upload is finished
                 return Ok(response.ETag);
+            } catch (AmazonS3Exception ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound) {
+                // abort is requested when upload is being completed
+                return Ok();
             } catch (Exception ex) {
                 return StatusCode(500, ex.Message);
             }
         }
 
         [HttpPost("abortUpload")]
-        public async Task<IActionResult> AbortUpload(string uploadId) {
+        public async Task<IActionResult> AbortUpload(string uploadId, string key) {
             try {
-                var response = await provider.AbortUploadAsync(uploadId);
-                // user response if you need to pass something to the client after aborting upload
+                var response = await provider.AbortUploadAsync(uploadId, key);
+                // use `response` if you need to pass something to the client after aborting upload
                 return Ok(response.HttpStatusCode);
             } catch (Exception ex) {
                 return StatusCode(500, ex.Message);
