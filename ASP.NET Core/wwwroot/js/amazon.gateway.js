@@ -11,6 +11,18 @@ class AmazonGateway {
     return `${this.baseUrl}/${methodName}`;
   }
 
+  logRequest(method, url, requestUrl) {
+    if (!this.onRequestExecuted) {
+      return;
+    }
+    const params = {
+      method,
+      urlPath: requestUrl,
+      queryString: url.toString().replace(requestUrl, ''),
+    };
+    this.onRequestExecuted(params);
+  }
+
   removeUploadData(fileName) {
     delete this.uploadData[fileName];
   }
@@ -31,46 +43,46 @@ class AmazonGateway {
     return this.uploadData[fileName].parts;
   }
 
-  async getItems(key) {
+  getItems(key) {
     const params = { 'path': key };
     const requestParams = { method: 'GET' };
-    return this.makeRequestAsync('getItems', params, requestParams);
+    return this.makeRequest('getItems', params, requestParams);
   }
 
-  async renameItem(key, parentPath, name) {
+  renameItem(key, parentPath, name) {
     const params = { 'key': key, 'directory': parentPath, 'newName': name };
     const requestParams = { method: 'PUT' };
-    await this.makeRequestAsync('renameItem', params, requestParams);
+    return this.makeRequest('renameItem', params, requestParams);
   }
 
-  async createDirectory(key, name) {
+  createDirectory(key, name) {
     const params = { 'path': key, 'name': name };
     const requestParams = { method: 'PUT' };
-    await this.makeRequestAsync('createDirectory', params, requestParams);
+    return this.makeRequest('createDirectory', params, requestParams);
   }
 
   async deleteItem(key) {
     const params = { 'item': key };
     const requestParams = { method: 'POST' };
-    await this.makeRequestAsync('deleteItem', params, requestParams);
+    await this.makeRequest('deleteItem', params, requestParams);
   }
 
   async copyItem(sourceKey, destinationKey) {
     const params = { 'sourceKey': sourceKey, 'destinationKey': destinationKey };
     const requestParams = { method: 'PUT' };
-    await this.makeRequestAsync('copyItem', params, requestParams);
+    await this.makeRequest('copyItem', params, requestParams);
   }
 
   async moveItem(sourceKey, destinationKey) {
     const params = { 'sourceKey': sourceKey, 'destinationKey': destinationKey };
     const requestParams = { method: 'POST' };
-    await this.makeRequestAsync('moveItem', params, requestParams);
+    await this.makeRequest('moveItem', params, requestParams);
   }
 
   async downloadItems(keys) {
     const params = {};
     const requestParams = { method: 'POST', body: JSON.stringify(keys), headers: this.defaultHeaders };
-    return this.makeRequestAsync('downloadItems', params, requestParams);
+    return this.makeRequest('downloadItems', params, requestParams);
   }
 
   async uploadPart(fileData, uploadInfo, destinationDirectory) {
@@ -89,7 +101,7 @@ class AmazonGateway {
       body: data,
     };
 
-    const etag = await this.makeRequestAsync('uploadPart', params, requestOptions);
+    const etag = await this.makeRequest('uploadPart', params, requestOptions);
     // partNumber must be > 0
     this.addPartToUploadData(key, { PartNumber: uploadInfo.chunkIndex + 1, ETag: etag });
   }
@@ -106,7 +118,7 @@ class AmazonGateway {
       body: JSON.stringify(this.getParts(key)),
     };
 
-    await this.makeRequestAsync('completeUpload', params, requestOptions);
+    await this.makeRequest('completeUpload', params, requestOptions);
     this.removeUploadData(key);
   }
 
@@ -117,49 +129,73 @@ class AmazonGateway {
       headers: this.defaultHeaders,
     };
 
-    const uploadId = await this.makeRequestAsync('initUpload', params, requestOptions);
+    const uploadId = await this.makeRequest('initUpload', params, requestOptions);
     this.initUploadData(params.key, uploadId);
   }
 
+  async abortFileUpload(fileData, uploadInfo, destinationDirectory) {
+    const key = `${destinationDirectory?.key ?? ''}${fileData.name}`;
+    const uploadId = this.getUploadId(fileData.name);
+    const params = { uploadId, key };
+    const requestOptions = {
+      method: 'POST',
+      headers: this.defaultHeaders,
+    };
+    return this.makeRequest('abortUpload', params, requestOptions);
+  }
+
+  /* eslint-disable-next-line spellcheck/spell-checker */
   async getPresignedDownloadUrl(fileName) {
     const params = { key: fileName };
     const requestOptions = {
       method: 'POST',
       headers: this.defaultHeaders,
     };
-    return await this.makeRequestAsync('getPresignedDownloadUrl', params, requestOptions);
+    return this.makeRequest('getPresignedDownloadUrl', params, requestOptions);
   }
 
-  async makeRequestAsync(method, queryParams, requestParams) {
+  async makeRequest(method, queryParams, requestParams) {
     const requestUrl = this.getRequestUrl(method);
     const url = new URL(requestUrl);
 
     Object.keys(queryParams).forEach((key) => url.searchParams.append(key, queryParams[key]));
+    this.logRequest(method, url, requestUrl);
 
-    if (this.onRequestExecuted) {
-      const params = {
-        method,
-        urlPath: requestUrl,
-        queryString: url.toString().replace(requestUrl, ''),
-      };
-      this.onRequestExecuted(params);
+    try {
+      const response = await fetch(url.toString(), requestParams);
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage);
+      }
+      return await this.getResponseData(response);
+    } catch (error) {
+      throw new Error(error.message);
     }
+  }
 
-    const response = await fetch(url.toString(), requestParams);
-
-    if (!response.ok) {
-      const errorResult = await response.text();
-      throw new Error(errorResult.errorText);
-    }
-    const contentDisposition = response.headers.get('Content-Disposition');
-    if (contentDisposition && contentDisposition.includes('attachment')) {
-      // processing downloadItems request
+  async getResponseData(response) {
+    if (this.containsAttachment(response)) {
       return response.blob();
     }
-    const contentType = response.headers.get('Content-Type');
-    if (!contentType || contentType.includes('text/plain')) {
+    if (this.containsPlainText(response)) {
       return response.text();
     }
     return response.json();
+  }
+
+  containsAttachment(response) {
+    const contentDisposition = response.headers.get('Content-Disposition');
+    if (contentDisposition && contentDisposition.includes('attachment')) {
+      return true;
+    }
+    return false;
+  }
+
+  containsPlainText(response) {
+    const contentType = response.headers.get('Content-Type');
+    if (!contentType || contentType.includes('text/plain')) {
+      return true;
+    }
+    return false;
   }
 }
