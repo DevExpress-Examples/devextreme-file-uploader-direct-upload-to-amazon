@@ -5,67 +5,43 @@ class AmazonFileSystem {
     this.gateway = new AmazonGateway(baseUrl, onRequestExecuted);
   }
 
-  async getItems(path) {
-    try {
-      return await this.gateway.getItems(path);
-    } catch (error) {
-      throw new DevExpress.fileManagement.FileSystemError(32767, path, error.message);
-    }
+  getItems(path) {
+    return this.gateway.getItems(path);
   }
 
-  async createDirectory(key, name) {
-    try {
-      return await this.gateway.createDirectory(key, name);
-    } catch (error) {
-      throw new DevExpress.fileManagement.FileSystemError(32767, name, error.message);
-    }
+  createDirectory(key, name) {
+    return this.gateway.createDirectory(key, name);
   }
 
-  async renameItem(key, parentPath, name) {
-    try {
-      return await this.gateway.renameItem(key, `${parentPath}/`, name);
-    } catch (error) {
-      throw new DevExpress.fileManagement.FileSystemError(32767, key, error.message);
-    }
+  renameItem(key, parentPath, name) {
+    return this.gateway.renameItem(key, `${parentPath}/`, name);
   }
 
-  async deleteItem(key) {
-    try {
-      return await this.gateway.deleteItem(key);
-    } catch (error) {
-      throw new DevExpress.fileManagement.FileSystemError(32767, key, error.message);
-    }
+  deleteItem(key) {
+    return this.gateway.deleteItem(key);
   }
 
-  async copyItem(item, destinationDir) {
-    try {
-      return await this.gateway.copyItem(item.key, `${destinationDir.key}${item.name}`);
-    } catch (error) {
-      throw new DevExpress.fileManagement.FileSystemError(32767, item.key, error.message);
-    }
+  copyItem(item, destinationDir) {
+    return this.gateway.copyItem(item.key, `${destinationDir.key}${item.name}`);
   }
 
-  async moveItem(item, destinationDir) {
-    try {
-      return await this.gateway.moveItem(item.key, `${destinationDir.key}${item.name}`);
-    } catch (error) {
-      throw new DevExpress.fileManagement.FileSystemError(32767, item.key, error.message);
-    }
+  moveItem(item, destinationDir) {
+    return this.gateway.moveItem(item.key, `${destinationDir.key}${item.name}`);
+  }
+
+  async abortFileUpload(fileData, uploadInfo, destinationDirectory) {
+    await this.gateway.abortFileUpload(fileData, uploadInfo, destinationDirectory);
   }
 
   async uploadFileChunk(fileData, uploadInfo, destinationDirectory) {
-    try {
-      if (uploadInfo.chunkIndex === 0) {
-        await this.gateway.initUpload(fileData, destinationDirectory);
-      }
+    if (uploadInfo.chunkIndex === 0) {
+      await this.gateway.initUpload(fileData, destinationDirectory);
+    }
+    // upload part even if a chunk is first or last
+    await this.gateway.uploadPart(fileData, uploadInfo, destinationDirectory);
 
-      await this.gateway.uploadPart(fileData, uploadInfo, destinationDirectory);
-
-      if (uploadInfo.chunkCount === uploadInfo.chunkIndex + 1) {
-        await this.gateway.completeUpload(fileData, uploadInfo, destinationDirectory);
-      }
-    } catch (error) {
-      throw new DevExpress.fileManagement.FileSystemError(32767, fileData.name, error.message);
+    if (uploadInfo.chunkCount === uploadInfo.chunkIndex + 1) {
+      await this.gateway.completeUpload(fileData, uploadInfo, destinationDirectory);
     }
   }
 
@@ -86,11 +62,7 @@ class AmazonFileSystem {
   async downloadItems(items) {
     const keys = items.map((x) => x.key);
     const fileName = keys.length > 1 ? 'archive.zip' : this.getFileNameFromKey(keys[0]);
-    try {
-      const blob = await this.gateway.downloadItems(keys);
-      saveAs(new Blob([blob], { type: 'application/octet-stream' }), fileName);
-    } catch (error) {
-      throw new DevExpress.fileManagement.FileSystemError(32767, fileName, error.message);
-    }
+    const blob = await this.gateway.downloadItems(keys);
+    saveAs(new Blob([blob], { type: 'application/octet-stream' }), fileName);
   }
 }
