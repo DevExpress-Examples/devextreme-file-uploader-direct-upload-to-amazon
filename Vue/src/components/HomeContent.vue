@@ -30,14 +30,14 @@ fetch('https://localhost:52366/api/AmazonS3/getItems')
     loadPanelVisible.value = false;
   });
 
-const uploadChunk = async (file: File, uploadInfo: UploadInfo): Promise<any> => {
+const uploadChunk = async(file: File, uploadInfo: UploadInfo): Promise<any> => {
   await amazon.uploadFileChunk(file, uploadInfo, undefined);
 };
 
-const abortUpload = async (file: File, uploadInfo: UploadInfo): Promise<any> => {
-  console.log("abort");
+const abortUpload = async(file: File, uploadInfo: UploadInfo): Promise<any> => {
+  console.log('abort');
   await amazon.abortFileUpload(file, uploadInfo, undefined);
-}
+};
 
 const onValueChangedEvent = (): void => {
   downloadPanelVisible.value = false;
@@ -45,12 +45,12 @@ const onValueChangedEvent = (): void => {
   downloadUrl.value = '';
 };
 
-const onUploaded = async (e: UploadedEvent): Promise<any> => {
+const onUploaded = async(e: UploadedEvent): Promise<any> => {
   const url = await amazon.getPresignedDownloadUrl(e.file.name);
   downloadFileName.value = e.file.name;
   downloadUrl.value = url;
   downloadPanelVisible.value = true;
-}
+};
 
 const loadPanelVisible: Ref<boolean> = ref(true);
 const wrapperClassName: Ref<string> = ref('');
@@ -80,7 +80,10 @@ const requests: Ref<{ method: string; urlPath: string; queryString: string }[]> 
       />
       <div v-if="downloadPanelVisible">
         <span>Download uploaded file:</span>
-        <a :href="downloadUrl" target="_blank">{{ downloadFileName }}</a>
+        <a
+          :href="downloadUrl"
+          target="_blank"
+        >{{ downloadFileName }}</a>
       </div>
       <div id="request-panel">
         <div

@@ -22,6 +22,7 @@ function App(): JSX.Element {
   const [downloadPanelVisible, setDownloadPanelVisible] = useState<boolean>(false);
 
   const uploadChunk = useCallback((file: File, uploadInfo: UploadInfo): Promise<any> => amazon.uploadFileChunk(file, uploadInfo, undefined), []);
+  const abortUpload = useCallback((file: File, uploadInfo: UploadInfo | undefined): Promise<any> => amazon.abortFileUpload(file, uploadInfo, undefined), []);
   const onValueChanged = useCallback((): void => {
     setDownloadPanelVisible(false);
     setDownloadFileName('');
@@ -63,6 +64,7 @@ function App(): JSX.Element {
         <FileUploader id="file-uploader"
           chunkSize={5242880}
           uploadChunk={uploadChunk}
+          abortUpload={abortUpload}
           onUploaded={onUploaded}
           onValueChanged={onValueChanged}
         />

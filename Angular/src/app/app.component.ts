@@ -44,12 +44,17 @@ export class AppComponent {
 
     this.checkAmazonStatus(http);
     this.uploadChunk = this.uploadChunk.bind(this);
+    this.abortUpload = this.abortUpload.bind(this);
     this.onUploaded = this.onUploaded.bind(this);
     this.onValueChanged = this.onValueChanged.bind(this);
   }
 
   async uploadChunk(file: File, uploadInfo: UploadInfo): Promise<any> {
     return this.amazon.uploadFileChunk(file, uploadInfo, undefined);
+  }
+
+  async abortUpload(file: File, uploadInfo: UploadInfo): Promise<any> {
+    return this.amazon.abortFileUpload(file, uploadInfo, undefined);
   }
 
   async onUploaded(e: UploadedEvent): Promise<any> {
