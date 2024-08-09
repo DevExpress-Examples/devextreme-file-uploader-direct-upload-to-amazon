@@ -4,11 +4,15 @@
 [![](https://img.shields.io/badge/📖_How_to_use_DevExpress_Examples-e9f6fc?style=flat-square)](https://docs.devexpress.com/GeneralInformation/403183)
 [![](https://img.shields.io/badge/💬_Leave_Feedback-feecdd?style=flat-square)](#does-this-example-address-your-development-requirementsobjectives)
 <!-- default badges end -->
-# FileUploader for DevExtreme - Direct Upload to Amazon
+# DevExtreme FileUploader - Direct Upload to Amazon
 
-The FileUploader component supports direct-upload to Amazon Simple Storage Service. This example illustrates how to configure the [uploadChunk](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxFileUploader/Configuration/#uploadChunk) property to upload a large file directly to Amazon Simple Storage Service (S3) without using a user's web server. All APIs that implement access to Amazon Simple Storage Service (S3) on the client are stored in the amazon.file.system.js and amazon.gateway.js files.
+The DevExtreme FileUploader component supports direct-upload to the Amazon Simple Storage Service. This example configures the [uploadChunk](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxFileUploader/Configuration/#uploadChunk) property to upload large files directly to Amazon Simple Storage Service (S3) without using a web server. All APIs used to access Amazon Simple Storage Service (S3) on the client are stored in `amazon.file.system.j`s and `amazon.gateway.js` files.
 
-To implement file upload logic, use the [uploadChunk](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxFileUploader/Configuration/#uploadChunk) property to specify how to process a connection request to the storage.
+**IMPORTANT**
+
+The code snippets in this repository are for informational purposes only. Security should be your #1 priority when using Amazon S3 storage. You should consult a security expert or apply accepted best practices to maintain the highest security posture for your DevExtreme-powered web application. Remember, a secure web app demands careful consideration/understanding of potential attack vectors, the configuration of your development environment, and security posture of third-party service providers.
+
+To implement file upload logic, use the [uploadChunk](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxFileUploader/Configuration/#uploadChunk) property (to process connection requests to the storage service).
 
 ## Files to Review
 
