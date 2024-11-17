@@ -6,6 +6,7 @@ $branchName = $env:branchName
 Write-Host "Branch name: $branchName"
 $global:errorCode = 0
 
+
 function Process-JavaScriptProjects {
     param (
         [string]$Path = ".",
