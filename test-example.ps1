@@ -2,7 +2,7 @@ param (
     [string]$version = "latest"
 )
 if (-not $env:buildVersion) {
-    $global:buildVersion = "latest"
+    $global:buildVersion = "24.1.7"
 } else {
     $global:buildVersion = $env:buildVersion
 }
@@ -84,7 +84,7 @@ function Process-DotNetProjects {
     }
 } 
 
-Write-Host "Version: $buildVersion"
+Write-Host "Version: $global:buildVersion"
 Process-JavaScriptProjects
 Process-DotNetProjects
 
