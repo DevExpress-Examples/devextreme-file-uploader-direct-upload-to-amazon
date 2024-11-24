@@ -1,9 +1,12 @@
 param (
     [string]$version = "latest"
 )
-$global:build = $env:buildVersion -ne $null ? $env:buildVersion : $version
-
-Write-Host "Build: $build"
+if (-not $env:buildVersion) {
+    $global:buildVersion = "latest"
+} else {
+    $global:buildVersion = $env:buildVersion
+}
+Write-Host "Build: $buildVersion"
 $global:errorCode = 0
 
 function Process-JavaScriptProjects {
@@ -30,7 +33,7 @@ function Process-JavaScriptProjects {
 
         Write-Host "`nUpdating packages..."
         foreach ($package in $($folder.Packages)) {
-            $command = "npm install $package@$global:build --save"
+            $command = "npm install $package@$global:buildVersion --save"
             Write-Output "Running: $command"
             Invoke-Expression $command
         }
@@ -81,7 +84,7 @@ function Process-DotNetProjects {
     }
 } 
 
-Write-Host "Version: $version"
+Write-Host "Version: $buildVersion"
 Process-JavaScriptProjects
 Process-DotNetProjects
 
