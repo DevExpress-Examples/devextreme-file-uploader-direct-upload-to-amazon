@@ -13,10 +13,10 @@ function Process-JavaScriptProjects {
     param (
         [string]$Path = ".",
         [hashtable[]]$Folders = @(
-            @{ Name = "jQuery"; Packages = @("devextreme", "devextreme-dist") },
-            @{ Name = "Angular"; Packages = @("devextreme", "devextreme-angular") },
-            @{ Name = "Vue"; Packages = @("devextreme", "devextreme-vue") },
-            @{ Name = "React"; Packages = @("devextreme", "devextreme-react") }
+            @{ Name = "jQuery"; Packages = @("devextreme-dist", "devextreme") },
+            @{ Name = "Angular"; Packages = @("devextreme-angular", "devextreme") },
+            @{ Name = "Vue"; Packages = @("devextreme-vue", "devextreme") },
+            @{ Name = "React"; Packages = @("devextreme-react", "devextreme") }
         )
     )
     Write-Host "Processing JavaScript Projects"
@@ -31,19 +31,34 @@ function Process-JavaScriptProjects {
         
         Set-Location $($folder.Name)
 
-        Write-Host "`nUpdating packages..."
-        foreach ($package in $($folder.Packages)) {
-            $command = "npm install $package@$global:buildVersion --save"
-            Write-Output "Running: $command"
-            Invoke-Expression $command
-        }
+		# Prepare the list of packages with their versions
+		$packages = $folder.Packages | ForEach-Object { "$_@$global:buildVersion" }
 
+		# Join the package list into a single string
+		$packageList = $packages -join " "
+
+		# Construct the npm install command
+		$command = "npm install $packageList --force --save --no-fund"
+
+		# Output and execute the command
+		Write-Output "Running: $command"
+		Invoke-Expression $command
+		
         Write-Host "Running 'npm install' in $($folder.Name)"
-        $installResult = & npm install --loglevel=error -PassThru
+        $installResult = & npm install --force --no-fund --loglevel=error -PassThru
         if ($LASTEXITCODE -ne 0) {
             Write-Error "npm install failed in $($folder.Name)"
             $global:errorCode = 1
         }
+
+        Write-Host "`nUpdating packages..."
+        #foreach ($package in $($folder.Packages)) {
+        #    $command = "npm install $package@$global:buildVersion --save"
+        #    Write-Output "Running: $command"
+        #    Invoke-Expression $command
+        #}
+		
+
 
         Write-Host "Running 'npm run build' in $($folder.Name)"
         $buildResult = & npm run build
