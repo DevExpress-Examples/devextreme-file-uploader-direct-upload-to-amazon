@@ -57,8 +57,6 @@ function Process-JavaScriptProjects {
         #    Write-Output "Running: $command"
         #    Invoke-Expression $command
         #}
-		
-
 
         Write-Host "Running 'npm run build' in $($folder.Name)"
         $buildResult = & npm run build
@@ -100,6 +98,10 @@ function Process-DotNetProjects {
 } 
 
 Write-Host "Version: $global:buildVersion"
+Write-Host "BUILD_NUMBER: $env:BUILD_NUMBER"
+Write-Host "BUILD_ID: $env:BUILD_ID"
+Write-Host "BUILD_DISPLAY_NAME: $env:BUILD_DISPLAY_NAME"
+
 Process-JavaScriptProjects
 Process-DotNetProjects
 
