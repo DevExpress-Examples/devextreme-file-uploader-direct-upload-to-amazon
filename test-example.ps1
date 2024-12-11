@@ -31,16 +31,12 @@ function Process-JavaScriptProjects {
         
         Set-Location $($folder.Name)
 
-		# Prepare the list of packages with their versions
 		$packages = $folder.Packages | ForEach-Object { "$_@$global:buildVersion" }
 
-		# Join the package list into a single string
 		$packageList = $packages -join " "
 
-		# Construct the npm install command
 		$command = "npm install $packageList --force --save --no-fund"
 
-		# Output and execute the command
 		Write-Output "Running: $command"
 		Invoke-Expression $command
 		
@@ -52,11 +48,6 @@ function Process-JavaScriptProjects {
         }
 
         Write-Host "`nUpdating packages..."
-        #foreach ($package in $($folder.Packages)) {
-        #    $command = "npm install $package@$global:buildVersion --save"
-        #    Write-Output "Running: $command"
-        #    Invoke-Expression $command
-        #}
 
         Write-Host "Running 'npm run build' in $($folder.Name)"
         $buildResult = & npm run build
