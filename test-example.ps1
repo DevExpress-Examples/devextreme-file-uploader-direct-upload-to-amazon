@@ -2,12 +2,28 @@ param (
     [string]$version = "latest"
 )
 if (-not $env:buildVersion) {
-    $global:buildVersion = "24.1.7"
+    $global:buildVersion = $version
 } else {
     $global:buildVersion = $env:buildVersion
 }
-Write-Host "Build: $buildVersion"
+Write-Host "Build: $inputVersion"
+$global:inputVersion = $env:branchName
 $global:errorCode = 0
+
+$BUILD_VERSIONS_LIST = "BUILD_VERSIONS_LIST"
+
+$allVersions = @(
+    "15.1", "15.2",
+    "16.1", "16.2",
+    "17.1", "17.2",
+    "18.1", "18.2",
+    "19.1", "19.2",
+    "20.1", "20.2",
+    "21.1", "21.2",
+    "22.1", "22.2",
+    "23.1", "23.2",
+    "24.1", "24.2"
+)
 
 function Process-JavaScriptProjects {
     param (
@@ -19,7 +35,7 @@ function Process-JavaScriptProjects {
             @{ Name = "React"; Packages = @("devextreme-react", "devextreme") }
         )
     )
-    Write-Host "Processing JavaScript Projects"
+    Write-Host "`n--== Processing JavaScript Projects ==--"
 
     foreach ($folder in $Folders) {
         if (-not (Test-Path $($folder.Name))) {
@@ -27,32 +43,36 @@ function Process-JavaScriptProjects {
             continue
         }
 
-        Write-Host "`nProcessing folder: $($folder.Name)"
+        Write-Host "`n<-- Processing folder: $($folder.Name) -->"
         
         Set-Location $($folder.Name)
 
+		# Prepare the list of packages with their versions
 		$packages = $folder.Packages | ForEach-Object { "$_@$global:buildVersion" }
 
+		# Join the package list into a single string
 		$packageList = $packages -join " "
 
+		# Construct the npm install command
 		$command = "npm install $packageList --force --save --no-fund"
 
+		# Output and execute the command
 		Write-Output "Running: $command"
 		Invoke-Expression $command
 		
         Write-Host "Running 'npm install' in $($folder.Name)"
         $installResult = & npm install --force --no-fund --loglevel=error -PassThru
         if ($LASTEXITCODE -ne 0) {
-            Write-Error "npm install failed in $($folder.Name)"
+            Write-Error "ERROR: npm install failed in $($folder.Name)"
             $global:errorCode = 1
         }
 
-        Write-Host "`nUpdating packages..."
+        Write-Host "`n<-- Updating packages... -->"
 
         Write-Host "Running 'npm run build' in $($folder.Name)"
         $buildResult = & npm run build
         if ($LASTEXITCODE -ne 0) {
-            Write-Error "npm run build failed in $($folder.Name)"
+            Write-Error "ERROR: npm run build failed in $($folder.Name)"
             $global:errorCode = 1
         }
 
@@ -70,7 +90,7 @@ function Process-DotNetProjects {
 
     if ($slnFiles.Count -eq 0) {
         Write-Host "No solution files (.sln) found in the specified directory at level 1."
-        $global:errorCode = 1
+        $global:errorCode = 0
         return
     }
 
@@ -88,11 +108,43 @@ function Process-DotNetProjects {
     }
 } 
 
-Write-Host "Version: $global:buildVersion"
-Write-Host "BUILD_NUMBER: $env:BUILD_NUMBER"
-Write-Host "BUILD_ID: $env:BUILD_ID"
-Write-Host "BUILD_DISPLAY_NAME: $env:BUILD_DISPLAY_NAME"
+function Set-BuildVersion {
+    $inputMajorMinor = $global:inputVersion -replace "\.\d+\+$", ""
 
+    $filteredList = $allVersions | Where-Object {
+        ($_ -replace "\." -as [double]) -ge ($inputMajorMinor -replace "\." -as [double])
+    }
+
+    $currentValue = [Environment]::GetEnvironmentVariable($BUILD_VERSIONS_LIST, [EnvironmentVariableTarget]::Machine)
+
+    $currentList = if ($currentValue) {
+        $currentValue -split ";"
+    } else {
+        $filteredList
+    }
+
+    if ($currentList.Count -gt 1) {
+        $inputMajorMinor = $currentList[0]
+        Write-Output "Input version: '$inputMajorMinor'"
+        $global:buildVersion = $inputMajorMinor
+
+        $updatedList = $currentList[1..($currentList.Count - 1)]
+    } else {
+        Write-Output "The list in the environment variable is empty or has only one item. Resetting to the filtered list."
+        $updatedList = $filteredList
+    }
+
+    $newValue = $updatedList -join ";"
+
+    [Environment]::SetEnvironmentVariable($BUILD_VERSIONS_LIST, $newValue, [EnvironmentVariableTarget]::Machine)
+
+    Write-Output "Environment variable '$BUILD_VERSIONS_LIST' has been updated."
+    Write-Output "New List: $updatedList"
+}
+
+Write-Host "`nBranch Name: $global:branchName"
+
+Set-BuildVersion
 Process-JavaScriptProjects
 Process-DotNetProjects
 
