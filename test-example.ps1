@@ -1,6 +1,6 @@
 Write-Output "Branch name: $env:branchName"
 $global:inputVersion = $env:branchName
-$global:LASTEXITCODE = 0
+$global:errorCode = 0
 
 $BUILD_VERSIONS_LIST = "BUILD_VERSIONS_LIST"
 
@@ -25,8 +25,8 @@ function Process-JavaScriptProjects {
         [hashtable[]]$Folders = @(
             @{ Name = "jQuery"; Packages = @("devextreme-dist", "devextreme") },
             @{ Name = "Angular"; Packages = @("devextreme-angular", "devextreme") },
-            @{ Name = "Vue"; Packages = @("devextreme-vue", "devextreme") },
-            @{ Name = "React"; Packages = @("devextreme-react", "devextreme") }
+            @{ Name = "React"; Packages = @("devextreme-react", "devextreme") },
+            @{ Name = "Vue"; Packages = @("devextreme-vue", "devextreme") }
         )
     )
     Write-Host "`n--== Processing JavaScript Projects ==--"
@@ -54,7 +54,7 @@ function Process-JavaScriptProjects {
         $installResult = & npm install --force --no-fund --loglevel=error -PassThru
         if ($LASTEXITCODE -ne 0) {
             Write-Error "ERROR: npm install failed in $($folder.Name)"
-            $global:LASTEXITCODE = 1
+            $global:errorCode = 1
         }
 
         Write-Host "`n<-- Updating packages... -->"
@@ -63,7 +63,7 @@ function Process-JavaScriptProjects {
         $buildResult = & npm run build
         if ($LASTEXITCODE -ne 0) {
             Write-Error "ERROR: npm run build failed in $($folder.Name)"
-            $global:LASTEXITCODE = 1
+            $global:errorCode = 1
         }
 
         Set-Location ..
@@ -92,7 +92,7 @@ function Process-DotNetProjects {
             Write-Host "Build succeeded for $($slnFile.FullName)."
         } else {
             Write-Error "Build failed for $($slnFile.FullName)."
-            $global:LASTEXITCODE = 1
+            $global:errorCode = 1
         }
     }
 } 
@@ -139,6 +139,6 @@ Set-BuildVersion
 Process-JavaScriptProjects
 Process-DotNetProjects
 
-Write-Host "Error code: $global:LASTEXITCODE"
+Write-Host "Error code: $global:errorCode"
 
-exit $global:LASTEXITCODE
+exit $global:errorCode
