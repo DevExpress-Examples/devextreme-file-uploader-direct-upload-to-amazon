@@ -58,14 +58,14 @@ function Process-JavaScriptProjects {
 		
         Write-Output "`nInstalling the rest of the packages $($folder.Name)"
         npm install --save --save-exact --no-fund --loglevel=error
-        if ($LASTEXITCODE -ne 0) {
+        if (-not $?) {
             Write-Error "`nERROR: Failed to install packages: $($folder.Name)"
             $global:errorCode = 1
         }
 
         Write-Output "`nBuilding the project with 'npm run build' $($folder.Name)"
         npm run build
-        if ($LASTEXITCODE -ne 0) {
+        if (-not $?) {
             Write-Error "`nERROR: Failed to build the project: $($folder.Name)"
             $global:errorCode = 1
         }
@@ -92,7 +92,7 @@ function Process-DotNetProjects {
         
         dotnet build $slnFile.FullName -c Release
 
-        if ($LASTEXITCODE -eq 0) {
+        if ($?) {
             Write-Output "`nBuild succeeded for $($slnFile.FullName)."
         } else {
             Write-Error "`nBuild failed for $($slnFile.FullName)."
