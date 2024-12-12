@@ -37,7 +37,7 @@ function Process-JavaScriptProjects {
         }
     }
 
-    $folders = @($jQueryEntry) + folders
+    $folders = @($jQueryEntry) + $folders
 
     foreach ($folder in $folders) {
         if (-not (Test-Path $($folder.Name))) {
