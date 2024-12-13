@@ -57,6 +57,7 @@ function Process-JavaScriptProjects {
         npm install $packageList --save --save-exact --no-fund
         if (-not $?) {
             Write-Error "`nERROR: Failed to install DevExtreme packages: $($folder.Name)"
+            $global:LASTEXITCODE = 1
             $global:errorCode = 1
         }
 
@@ -64,6 +65,7 @@ function Process-JavaScriptProjects {
         npm install --save --save-exact --no-fund --loglevel=error
         if (-not $?) {
             Write-Error "`nERROR: Failed to install packages: $($folder.Name)"
+            $global:LASTEXITCODE = 1
             $global:errorCode = 1
         }
 
@@ -71,6 +73,7 @@ function Process-JavaScriptProjects {
         npm run build
         if (-not $?) {
             Write-Error "`nERROR: Failed to build the project: $($folder.Name)"
+            $global:LASTEXITCODE = 1
             $global:errorCode = 1
         }
 
@@ -100,6 +103,7 @@ function Process-DotNetProjects {
             Write-Output "`nBuild succeeded for $($slnFile.FullName)."
         } else {
             Write-Error "`nBuild failed for $($slnFile.FullName)."
+            $global:LASTEXITCODE = 1
             $global:errorCode = 1
         }
     }
