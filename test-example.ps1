@@ -149,13 +149,14 @@ function Set-BuildVersion {
 function Set-TestingFailed {
     $TempDirectory = Join-Path -Path (Get-Location) -ChildPath "TEMP"
     if (-not (Test-Path -Path $TempDirectory)) {
+        Write-Output "`nCreating a temp directory at $TempDirectory"
         New-Item -ItemType Directory -Path $TempDirectory | Out-Null
     }
 
     $ReadmeFile = Join-Path -Path $TempDirectory -ChildPath "README.md"
 
     $Content = "Example testing failed: (Example testing failed)[https://example-testing-failed.com/]"
-
+    Write-Output "`nWriting a file with invalid link to a temp directory at $TempDirectory"
     Set-Content -Path $ReadmeFile -Value $Content
 }
 
