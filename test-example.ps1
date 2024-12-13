@@ -55,7 +55,11 @@ function Process-JavaScriptProjects {
 
         Write-Output "`nInstalling DevExtreme packages"
         npm install $packageList --save --save-exact --no-fund
-		
+        if (-not $?) {
+            Write-Error "`nERROR: Failed to install DevExtreme packages: $($folder.Name)"
+            $global:errorCode = 1
+        }
+
         Write-Output "`nInstalling the rest of the packages $($folder.Name)"
         npm install --save --save-exact --no-fund --loglevel=error
         if (-not $?) {
