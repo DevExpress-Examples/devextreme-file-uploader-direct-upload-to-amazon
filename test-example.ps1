@@ -147,7 +147,7 @@ function Set-BuildVersion {
 }
 
 function Set-TestingFailed {
-    $TempDirectory = Join-Path -Path (Get-Location) -ChildPath "TEMP"
+    $TempDirectory = Join-Path -Path $env:WORKSPACE -ChildPath "TEMP"
     if (-not (Test-Path -Path $TempDirectory)) {
         Write-Output "`nCreating a temp directory at $TempDirectory"
         New-Item -ItemType Directory -Path $TempDirectory | Out-Null
