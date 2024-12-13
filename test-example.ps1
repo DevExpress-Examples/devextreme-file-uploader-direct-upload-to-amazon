@@ -146,16 +146,34 @@ function Set-BuildVersion {
     Write-Output "New List: $updatedList"
 }
 
-Write-Output "`nBranch Name: $global:branchName"
+function Set-TestingFailed {
+    $TempDirectory = Join-Path -Path (Get-Location) -ChildPath "TEMP"
+    if (-not (Test-Path -Path $TempDirectory)) {
+        New-Item -ItemType Directory -Path $TempDirectory | Out-Null
+    }
+
+    $ReadmeFile = Join-Path -Path $TempDirectory -ChildPath "README.md"
+
+    $Content = "Example testing failed: (Example testing failed)[https://example-testing-failed.com/]"
+
+    Set-Content -Path $ReadmeFile -Value $Content
+}
+
+Write-Output "`nBranch Name: $env:branchName"
 
 Set-BuildVersion
 if (-not $global:buildVersion) {
     Write-Output "`nThe buildVersion is null or an empty string."
-    exit 1
+    Set-TestingFailed
+    [System.Environment]::Exit($global:errorCode)
 }
 Process-JavaScriptProjects -buildVersion $global:buildVersion
 Process-DotNetProjects
 
 Write-Output "`nFinished testing. Error code: $global:errorCode"
+
+if ($global:errorCode -ne 0) {
+    Set-TestingFailed
+}
 
 [System.Environment]::Exit($global:errorCode)
