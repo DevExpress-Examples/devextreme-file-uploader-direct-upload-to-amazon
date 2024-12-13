@@ -158,4 +158,4 @@ Process-DotNetProjects
 
 Write-Output "`nFinished testing. Error code: $global:errorCode"
 
-exit $global:errorCode
+[System.Environment]::Exit($global:errorCode)
