@@ -155,7 +155,7 @@ function Set-TestingFailed {
 
     $ReadmeFile = Join-Path -Path $TempDirectory -ChildPath "README.md"
 
-    $Content = "Example testing failed: (Example testing failed)[https://example-testing-failed.com/]"
+    $Content = "Example testing failed: [Example testing failed](https://example-testing-failed.com/)"
     Write-Output "`nWriting a file with invalid link to a temp directory at $TempDirectory"
     Set-Content -Path $ReadmeFile -Value $Content
 }
