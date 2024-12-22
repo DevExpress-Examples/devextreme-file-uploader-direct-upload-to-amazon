@@ -14,6 +14,7 @@ $global:BRANCH_NAME = $branchName
 $global:BUILD_VERSION = $buildVersion
 
 $global:ERROR_CODE = 0
+$global:FAILED_PROJECTS = @()
 
 $global:ALL_VERSIONS = @(
     "14.1", "14.2",
@@ -108,6 +109,7 @@ function Process-JavaScriptProjects {
             Write-Error "`nAn error occurred: $_"
             $global:LASTEXITCODE = 1
             $global:ERROR_CODE = 1
+            $global:FAILED_PROJECTS += $folderName
         } finally {
             Pop-Location
         }
@@ -146,6 +148,7 @@ function Process-DotNetProjects {
             Write-Error "`nERROR: $_"
             $global:LASTEXITCODE = 1
             $global:ERROR_CODE = 1
+            $global:FAILED_PROJECTS += "ASP.NET"
         }
     }
 
@@ -199,8 +202,17 @@ function Set-BuildVersion {
 }
 
 function Write-BuildInfo {
-    $BRANCH_NAME = if ($global:BRANCH_NAME -ne $null) { $global:BRANCH_NAME } else { "(empty)" }
-    $BUILD_VERSION = if ($global:BUILD_VERSION -ne $null) { $global:BUILD_VERSION } else { "(empty)" }
+    $BRANCH_NAME = if ($global:BRANCH_NAME -ne $null -and $global:BRANCH_NAME -ne "") { 
+        $global:BRANCH_NAME 
+    } else { 
+        "(empty)" 
+    }
+
+    $BUILD_VERSION = if ($global:BUILD_VERSION -ne $null -and $global:BUILD_VERSION -ne "") { 
+        $global:BUILD_VERSION 
+    } else { 
+        "(empty)" 
+    }
 
     Write-Output "`nBranch Name: $BRANCH_NAME"
     Write-Output "Build Version: $BUILD_VERSION"
@@ -212,5 +224,8 @@ Process-JavaScriptProjects -buildVersion $global:BUILD_VERSION
 Process-DotNetProjects
 
 Write-Output "`nFinished testing. Error code: $global:ERROR_CODE"
+if ($global:ERROR_CODE -ne 0 -and $global:FAILED_PROJECTS.Count -gt 0) {
+    Write-Output "`nFAILED PROJECTS: $(($global:FAILED_PROJECTS -join ", "))"
+}
 
 [System.Environment]::Exit($global:ERROR_CODE)
