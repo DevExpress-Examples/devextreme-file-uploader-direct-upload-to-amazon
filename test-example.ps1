@@ -223,9 +223,9 @@ Set-BuildVersion
 Process-JavaScriptProjects -buildVersion $global:BUILD_VERSION
 Process-DotNetProjects
 
-Write-Output "`nFinished testing. Error code: $global:ERROR_CODE"
+Write-Output "`nFinished testing version: $global:BUILD_VERSION. Error code: $global:ERROR_CODE"
 if ($global:ERROR_CODE -ne 0 -and $global:FAILED_PROJECTS.Count -gt 0) {
-    Write-Output "`nFAILED PROJECTS: $(($global:FAILED_PROJECTS -join ", "))"
+    Write-Output "`FAILED PROJECTS: $(($global:FAILED_PROJECTS -join ", "))"
 }
 
 [System.Environment]::Exit($global:ERROR_CODE)
