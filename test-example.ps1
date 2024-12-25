@@ -228,4 +228,4 @@ if ($global:ERROR_CODE -ne 0 -and $global:FAILED_PROJECTS.Count -gt 0) {
     Write-Output "`FAILED PROJECTS: $(($global:FAILED_PROJECTS -join ", "))"
 }
 
-[System.Environment]::Exit($global:ERROR_CODE)
+exit $global:ERROR_CODE
