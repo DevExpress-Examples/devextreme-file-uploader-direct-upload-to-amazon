@@ -8,6 +8,8 @@ param (
     [string]$buildVersion = [Environment]::GetEnvironmentVariable("BUILD_VERSION", [EnvironmentVariableTarget]::Machine)
 )
 
+$global:CODE_CENTRAL_BUILD_VERSION = $Env:CodeCentralBuildVersion
+
 # Repository's branch name, e.g. 24.1.3+
 $global:BRANCH_NAME = $branchName
 # Masstest-specific parameter. Specifies the minor version (example: '21.1.5') !or daily build (example: '21.2.2005')
@@ -218,6 +220,8 @@ function Write-BuildInfo {
     Write-Output "Build Version: $BUILD_VERSION"
 }
 
+Write-Output "Code central build version:"
+Write-Output $global:CODE_CENTRAL_BUILD_VERSION
 Write-BuildInfo
 Set-BuildVersion
 Process-JavaScriptProjects -buildVersion $global:BUILD_VERSION
