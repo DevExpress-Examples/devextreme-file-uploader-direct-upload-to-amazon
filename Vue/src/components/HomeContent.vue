@@ -34,8 +34,7 @@ const uploadChunk = async(file: File, uploadInfo: UploadInfo): Promise<any> => {
   await amazon.uploadFileChunk(file, uploadInfo, undefined);
 };
 
-const abortUpload = async(file: File, uploadInfo: UploadInfo): Promise<any> => {
-  console.log('abort');
+const abortUpload = async(file: File, uploadInfo?: UploadInfo): Promise<any> => {
   await amazon.abortFileUpload(file, uploadInfo, undefined);
 };
 
@@ -143,8 +142,7 @@ const requests: Ref<{ method: string; urlPath: string; queryString: string }[]> 
   #request-panel {
     min-width: 505px;
     height: 400px;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden auto;
     padding: 18px;
     margin-top: 40px;
     background-color: rgba(191, 191, 191, 0.15);

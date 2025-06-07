@@ -155,7 +155,7 @@ export class AmazonGateway {
     this.removeUploadData(key);
   }
   /* eslint-disable-next-line vue/max-len */
-  async abortFileUpload(fileData: File, uploadInfo: UploadInfo, destinationDirectory: FileSystemItem | undefined): Promise<any> {
+  async abortFileUpload(fileData: File, uploadInfo?: UploadInfo, destinationDirectory?: FileSystemItem | undefined): Promise<any> {
     const key = `${destinationDirectory?.key ?? ''}${fileData.name}`;
     const uploadId = this.getUploadId(fileData.name);
     const params = { uploadId, key };

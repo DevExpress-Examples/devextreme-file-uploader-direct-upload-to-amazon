@@ -53,7 +53,7 @@ export class AppComponent {
     return this.amazon.uploadFileChunk(file, uploadInfo, undefined);
   }
 
-  async abortUpload(file: File, uploadInfo: UploadInfo): Promise<any> {
+  async abortUpload(file: File, uploadInfo?: UploadInfo): Promise<any> {
     return this.amazon.abortFileUpload(file, uploadInfo, undefined);
   }
 
