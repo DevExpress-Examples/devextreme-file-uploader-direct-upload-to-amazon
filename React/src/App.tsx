@@ -1,12 +1,12 @@
-import React, {
+import {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 import './App.css';
 import 'devextreme/dist/css/dx.material.blue.light.compact.css';
 import FileUploader from 'devextreme-react/file-uploader';
 import LoadPanel from 'devextreme-react/load-panel';
-import UploadInfo from 'devextreme/file_management/upload_info';
-import { UploadedEvent } from 'devextreme/ui/file_uploader';
+import type UploadInfo from 'devextreme/file_management/upload_info';
+import type { UploadedEvent } from 'devextreme/ui/file_uploader';
 import { AmazonGateway } from './services/amazon.gateway';
 import { AmazonFileSystem } from './services/amazon.filesystem';
 

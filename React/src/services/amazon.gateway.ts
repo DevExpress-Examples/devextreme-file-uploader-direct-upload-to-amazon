@@ -139,7 +139,7 @@ export class AmazonGateway {
     this.addPartToUploadData(key, { PartNumber: uploadInfo.chunkIndex + 1, ETag: etag });
   }
 
-  async completeUpload(fileData: File, uploadInfo: UploadInfo, destinationDirectory: FileSystemItem | undefined): Promise<any> {
+  async completeUpload(fileData: File, _uploadInfo: UploadInfo, destinationDirectory: FileSystemItem | undefined): Promise<any> {
     const key = `${destinationDirectory?.key ?? ''}${fileData.name}`;
     const params = {
       key,
@@ -155,7 +155,7 @@ export class AmazonGateway {
     this.removeUploadData(key);
   }
 
-  async abortFileUpload(fileData: File, uploadInfo: UploadInfo | undefined, destinationDirectory: FileSystemItem | undefined): Promise<any> {
+  async abortFileUpload(fileData: File, _uploadInfo: UploadInfo | undefined, destinationDirectory: FileSystemItem | undefined): Promise<any> {
     const key = `${destinationDirectory?.key ?? ''}${fileData.name}`;
     const uploadId = this.getUploadId(fileData.name);
     const params = { uploadId, key };
