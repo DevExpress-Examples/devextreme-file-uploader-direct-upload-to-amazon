@@ -8,9 +8,9 @@
     "build": "tsc -b && vite build",
     "test": "vitest",
     "test:watch": "vitest --watch",
-    "lint-ts": "eslint .",
+    "lint-js": "eslint .",
     "lint-css": "stylelint src/**/*.css --allow-empty-input",
-    "lint": "npm-run-all -p -c lint-ts lint-css",
+    "lint": "npm-run-all -p -c lint-js lint-css",
     "preview": "vite preview"
   },
   
@@ -18,7 +18,8 @@
     "devextreme": "^24.2.3",
     "devextreme-react": "^24.2.3",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "file-saver": "2.0.5"
   },
    "eslintConfig": {
     "extends": [
@@ -31,6 +32,7 @@
     "@testing-library/react": "^14.1.2",
     "@testing-library/user-event": "^14.4.3",
     "@types/react": "^18.2.47",
+    "@types/file-saver": "2.0.5",
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react": "^4.4.1",
     "@vitest/coverage-v8": "^1.5.0",

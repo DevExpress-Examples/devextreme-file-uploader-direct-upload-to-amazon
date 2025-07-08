@@ -1,20 +1,18 @@
 <!-- default badges list -->
-![](https://img.shields.io/endpoint?url=https://codecentral.devexpress.com/api/v1/VersionRange/800447205/25.1.3%2B)
+![](https://img.shields.io/endpoint?url=https://codecentral.devexpress.com/api/v1/VersionRange/800447205/25.1.2%2B)
 [![](https://img.shields.io/badge/Open_in_DevExpress_Support_Center-FF7200?style=flat-square&logo=DevExpress&logoColor=white)](https://supportcenter.devexpress.com/ticket/details/T1233410)
 [![](https://img.shields.io/badge/📖_How_to_use_DevExpress_Examples-e9f6fc?style=flat-square)](https://docs.devexpress.com/GeneralInformation/403183)
 [![](https://img.shields.io/badge/💬_Leave_Feedback-feecdd?style=flat-square)](#does-this-example-address-your-development-requirementsobjectives)
 <!-- default badges end -->
-# DevExtreme Examples Template
+# DevExtreme FileUploader - Direct Upload to Amazon
 
-This is the repository template for creating new examples. 
+The DevExtreme FileUploader component supports direct-upload to the Amazon Simple Storage Service. This example configures the [uploadChunk](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxFileUploader/Configuration/#uploadChunk) property to upload large files directly to Amazon Simple Storage Service (S3) without using a web server. All APIs used to access Amazon Simple Storage Service (S3) on the client are stored in `amazon.file.system.j`s and `amazon.gateway.js` files.
 
-Use **_Product_ for DevExtreme - _Task_** template for a title. 
+**IMPORTANT**
 
-Describe the solved task in this section.
+The code snippets in this repository are for informational purposes only. Security should be your #1 priority when using Amazon S3 storage. You should consult a security expert or apply accepted best practices to maintain the highest security posture for your DevExtreme-powered web application. Remember, a secure web app demands careful consideration/understanding of potential attack vectors, the configuration of your development environment, and security posture of third-party service providers.
 
-Put a screenshot/gif that illustrates the result here.
-
-Then, add implementation details (steps, code snippets, and other technical information in a free form), or add a link to an existing document with implementation details. 
+To implement file upload logic, use the [uploadChunk](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxFileUploader/Configuration/#uploadChunk) property (to process connection requests to the storage service).
 
 ## Files to Review
 
@@ -32,15 +30,15 @@ Then, add implementation details (steps, code snippets, and other technical info
 
 ## Documentation
 
-- link
-- link
-- ...
+- [FileUploader Overview](https://js.devexpress.com/Angular/Documentation/Guide/UI_Components/FileUploader/Overview/)
+- [uploadChunk](https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxFileUploader/Configuration/#uploadChunk)
 
 ## More Examples
 
-- link
-- link
-- ...
+- [FileManager for DevExtreme - Amazon S3 Client-Side Binding](https://github.com/DevExpress-Examples/devextreme-file-manager-amazon-client-side-binding)
+- [FileManager for DevExtreme - Azure Client-Side Binding](https://github.com/DevExpress-Examples/devextreme-file-manager-azure-client-side-binding)
+- [FileManager for DevExtreme - Azure Server-Side Binding](https://github.com/DevExpress-Examples/devextreme-file-manager-azure-server-side-binding)
+- [FileUploader for DevExtreme - Direct Upload to Azure](https://github.com/DevExpress-Examples/devextreme-file-uploader-direct-upload-to-azure)
 <!-- feedback -->
 ## Does this example address your development requirements/objectives?
 

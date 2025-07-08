@@ -7,12 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace ASP_NET_Core
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
+namespace ASP_NET_Core {
+    public class Program {
+        public static void Main(string[] args) {
             CreateHostBuilder(args).Build().Run();
         }
 

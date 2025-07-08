@@ -4,12 +4,14 @@
   "private": true,
   "dependencies": {
     "jquery": "3.7.1",
+    "file-saver": "2.0.5",
     "devextreme-dist": "^24.2.3",
     "devextreme-aspnet-data": "^5.0.0",
     "bootstrap": "^5.3.3"
   },
   "devDependencies": {
     "gulp": "4.0.2",
+    "@types/file-saver": "2.0.5",
     "gulp-concat": "2.6.1",
     "rimraf": "5.0.7"
   }
