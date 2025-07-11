@@ -6,9 +6,6 @@ Download the example and use Visual Studio 2022 (or later) or Visual Studio Code
 
 ## Client-side resources and bundling
 
-<<<<<<< HEAD
-This project uses [NPM](https://www.npmjs.com/) and [Gulp.js](https://gulpjs.com/) to install client-side libraries. The project restores NPM packages before the first build. Then, Gulp bundles required scripts and CSS files into the resulting package during the first and every next build. 
-=======
 This project uses [NPM](https://www.npmjs.com/) and [Gulp.js](https://gulpjs.com/) to install client-side libraries. The project restores NPM packages before the first build. Then, Gulp bundles required scripts and CSS files into the resulting package during the first and every next build.
 
 The project includes:
@@ -17,7 +14,6 @@ The project includes:
 - DevExtreme.AspNet.Data 5.*
 - jQuery 3.7.1
 - Bootstrap 5.3.3 
->>>>>>> template/25.1.2+
 
 The resulted bundles will be located in the `wwwroot` folder:
 * `css/vendor.css` - a file with all CSS styles.
