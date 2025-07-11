@@ -1,3 +1,6 @@
+import {
+  useState, useEffect, useCallback, useMemo,
+} from 'react';
 import './App.css';
 import 'devextreme/dist/css/dx.material.blue.light.compact.css';
 import FileUploader from 'devextreme-react/file-uploader';
