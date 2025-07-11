@@ -8,9 +8,9 @@
     "build": "tsc -b && vite build",
     "test": "vitest",
     "test:watch": "vitest --watch",
-    "lint-js": "eslint .",
+    "lint-ts": "eslint .",
     "lint-css": "stylelint src/**/*.css --allow-empty-input",
-    "lint": "npm-run-all -p -c lint-js lint-css",
+    "lint": "npm-run-all -p -c lint-ts lint-css",
     "preview": "vite preview"
   },
   

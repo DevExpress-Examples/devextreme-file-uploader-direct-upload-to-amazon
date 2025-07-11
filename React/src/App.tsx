@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 import {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
+=======
+import { useCallback, useState } from 'react';
+>>>>>>> template/25.1.2+
 import './App.css';
 import 'devextreme/dist/css/dx.material.blue.light.compact.css';
 import FileUploader from 'devextreme-react/file-uploader';

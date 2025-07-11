@@ -2,6 +2,7 @@
   visibility: hidden;
 }
 
+<<<<<<< HEAD
 #message-box {
   display: none;
 }
@@ -41,3 +42,9 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+=======
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+>>>>>>> template/25.1.2+
