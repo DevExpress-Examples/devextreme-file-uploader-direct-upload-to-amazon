@@ -13,18 +13,19 @@ This project includes:
 
 ## Recommended IDE Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+For best TypeScript support in VS Code, see the official Vue guide: [Using Vue with TypeScript in VS Code](https://vuejs.org/guide/typescript/overview#using-vue-with-typescript).
 
 ## Type Support for `.vue` Imports in TS
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. For editor integration, see the official Vue guide: [Using Vue with TypeScript in VS Code](https://vuejs.org/guide/typescript/overview#using-vue-with-typescript).
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/vuejs/language-tools/discussions/471) that is more performant. You can enable it by the following steps:
 
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+> **Note:**
+> To type-check your project, use:
+> ```sh
+> npm run type-check
+> ```
+> This uses `vue-tsc` to provide type checking for `.vue` files, as recommended in the [official Vue TypeScript guide](https://vuejs.org/guide/typescript/overview.html).
 
 ## Customize configuration
 
