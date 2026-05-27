@@ -67,7 +67,7 @@ export class AppComponent {
     this.downloadPanelVisible = true;
   }
 
-  onValueChanged(e: ValueChangedEvent): void {
+  onValueChanged(_e: ValueChangedEvent): void {
     this.downloadPanelVisible = false;
     this.downloadFileName = '';
     this.downloadUrl = '';

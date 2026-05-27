@@ -21,6 +21,14 @@ function App(): JSX.Element {
   const [downloadUrl, setDownloadUrl] = useState<string>('');
   const [downloadPanelVisible, setDownloadPanelVisible] = useState<boolean>(false);
 
+  const onRequestExecuted = useCallback(({ method, urlPath, queryString }: { method: string; urlPath: string; queryString: string }): void => {
+    const request = { method, urlPath, queryString };
+    setRequests((prevRequests) => [request, ...prevRequests]);
+  }, []);
+
+  const gateway = useMemo((): AmazonGateway => new AmazonGateway(endpointUrl, onRequestExecuted), []);
+  const amazon = useMemo((): AmazonFileSystem => new AmazonFileSystem(gateway), []);
+
   const uploadChunk = useCallback((file: File, uploadInfo: UploadInfo): Promise<any> => amazon.uploadFileChunk(file, uploadInfo, undefined), []);
   const abortUpload = useCallback((file: File, uploadInfo: UploadInfo | undefined): Promise<any> => amazon.abortFileUpload(file, uploadInfo, undefined), []);
   const onValueChanged = useCallback((): void => {
@@ -50,13 +58,6 @@ function App(): JSX.Element {
       })
       .catch(() => { });
   }, []);
-  const onRequestExecuted = useCallback(({ method, urlPath, queryString }: { method: string; urlPath: string; queryString: string }): void => {
-    const request = { method, urlPath, queryString };
-    setRequests((requests) => [request, ...requests]);
-  }, []);
-
-  const gateway = useMemo((): AmazonGateway => new AmazonGateway(endpointUrl, onRequestExecuted), []);
-  const amazon = useMemo((): AmazonFileSystem => new AmazonFileSystem(gateway), []);
   return (
     <div id="wrapper" className={wrapperClassName}>
       <LoadPanel visible={loadPanelVisible} position={loadPanelPosition} />
