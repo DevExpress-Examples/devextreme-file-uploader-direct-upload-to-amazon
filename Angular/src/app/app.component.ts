@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NgIf, NgFor } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
 
