@@ -7,9 +7,12 @@ import { ValueChangedEvent, UploadedEvent } from 'devextreme/ui/file_uploader';
 
 import { AmazonGateway } from './services/amazon.gateway';
 import { AmazonFileSystem } from './services/amazon.filesystem';
+import { DxFileUploaderModule } from 'devextreme-angular/ui/file-uploader';
+import { DxLoadPanelModule } from 'devextreme-angular/ui/load-panel';
 
 @Component({
   selector: 'app-root',
+  imports: [DxFileUploaderModule, DxLoadPanelModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
