@@ -117,7 +117,6 @@ export class AmazonGateway {
     const uploadId = await this.makeRequest('initUpload', params, requestOptions);
     this.initUploadData(params.key, uploadId);
   }
-  /* eslint-disable-next-line vue/max-len */
   async uploadPart(fileData: File, uploadInfo: UploadInfo, destinationDirectory: FileSystemItem | undefined): Promise<any> {
     const params = {};
     const key = `${destinationDirectory?.key ?? ''}${fileData.name}`;
@@ -138,7 +137,6 @@ export class AmazonGateway {
     // partNumber must be > 0
     this.addPartToUploadData(key, { PartNumber: uploadInfo.chunkIndex + 1, ETag: etag });
   }
-  /* eslint-disable-next-line vue/max-len */
   async completeUpload(fileData: File, uploadInfo: UploadInfo, destinationDirectory: FileSystemItem | undefined): Promise<any> {
     const key = `${destinationDirectory?.key ?? ''}${fileData.name}`;
     const params = {
@@ -154,7 +152,6 @@ export class AmazonGateway {
     await this.makeRequest('completeUpload', params, requestOptions);
     this.removeUploadData(key);
   }
-  /* eslint-disable-next-line vue/max-len */
   async abortFileUpload(fileData: File, uploadInfo?: UploadInfo, destinationDirectory?: FileSystemItem | undefined): Promise<any> {
     const key = `${destinationDirectory?.key ?? ''}${fileData.name}`;
     const uploadId = this.getUploadId(fileData.name);
@@ -178,7 +175,6 @@ export class AmazonGateway {
         const errorMessage = await response.text();
         throw new Error(errorMessage);
       }
-      /* eslint-disable-next-line @typescript-eslint/no-unsafe-return */
       return await this.getResponseData(response);
     } catch (error: any) {
       throw new Error(error);

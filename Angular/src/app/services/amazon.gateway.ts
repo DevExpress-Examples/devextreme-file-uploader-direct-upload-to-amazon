@@ -178,7 +178,6 @@ export class AmazonGateway {
         const errorMessage = await response.text();
         throw new Error(errorMessage);
       }
-      /* eslint-disable-next-line @typescript-eslint/no-unsafe-return */
       return await this.getResponseData(response);
     } catch (error: any) {
       throw new Error(error);

@@ -74,7 +74,7 @@ const requests: Ref<{ method: string; urlPath: string; queryString: string }[]> 
         :chunk-size="5242880"
         :upload-chunk="uploadChunk"
         :abort-upload="abortUpload"
-        @valueChanged="onValueChangedEvent"
+        @value-changed="onValueChangedEvent"
         @uploaded="onUploaded"
       />
       <div v-if="downloadPanelVisible">
