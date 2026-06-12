@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom } from 'rxjs';
@@ -15,6 +15,7 @@ import { DxLoadPanelModule } from 'devextreme-angular/ui/load-panel';
   selector: 'app-root',
   imports: [DxFileUploaderModule, DxLoadPanelModule, NgIf, NgFor],
   templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
